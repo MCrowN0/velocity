@@ -1,0 +1,14 @@
+{"backend":"windows-sys","startup_ms":23.5783,"empty_pump_ns":5.48,"input_median_ns":1114.0625,"input_p95_ns":1392.1875,"events":128000}
+{"backend":"winit","startup_ms":35.3021,"empty_pump_ns":184.27,"input_median_ns":2585.15625,"input_p95_ns":3317.1875,"events":128000}
+{"backend":"windows-sys","startup_ms":28.5532,"empty_pump_ns":6.47,"input_median_ns":1292.1875,"input_p95_ns":1770.3125,"events":128000}
+{"backend":"winit","startup_ms":34.6952,"empty_pump_ns":171.8,"input_median_ns":2703.90625,"input_p95_ns":3397.65625,"events":128000}
+{"backend":"windows-sys","startup_ms":26.576900000000002,"empty_pump_ns":7.51,"input_median_ns":1285.15625,"input_p95_ns":1544.53125,"events":128000}
+{"backend":"winit","startup_ms":40.8168,"empty_pump_ns":197.88,"input_median_ns":2487.5,"input_p95_ns":3090.625,"events":128000}
+{"backend":"windows-sys","startup_ms":23.0886,"empty_pump_ns":5.35,"input_median_ns":1112.5,"input_p95_ns":1393.75,"events":128000}
+{"backend":"winit","startup_ms":34.7577,"empty_pump_ns":169.67,"input_median_ns":2697.65625,"input_p95_ns":3178.125,"events":128000}
+{"backend":"windows-sys","startup_ms":24.951999999999998,"empty_pump_ns":6.45,"input_median_ns":1163.28125,"input_p95_ns":1443.75,"events":128000}
+{"backend":"winit","startup_ms":40.4168,"empty_pump_ns":195.52,"input_median_ns":2498.4375,"input_p95_ns":2997.65625,"events":128000}
+{"backend":"windows-sys","startup_ms":29.433500000000002,"empty_pump_ns":5.43,"input_median_ns":1314.0625,"input_p95_ns":5642.1875,"events":128000}
+{"backend":"winit","startup_ms":132.6888,"empty_pump_ns":175.41,"input_median_ns":2664.84375,"input_p95_ns":8839.84375,"events":128000}
+{"backend":"windows-sys","startup_ms":27.761999999999997,"empty_pump_ns":8.24,"input_median_ns":1286.71875,"input_p95_ns":1784.375,"events":128000}
+{"backend":"winit","startup_ms":45.5696,"empty_pump_ns":201.15,"input_median_ns":2549.21875,"input_p95_ns":3971.09375,"events":128000}
