@@ -71,3 +71,9 @@ cargo run --release --example bench_renderer -- 10000
 The verification examples open a window and exit when finished. Diagnostic
 readbacks (`render_capture` and `read_surface`) block until complete and return
 top-left RGBA; surface RGB is premultiplied.
+
+## License
+
+Copyright 2026 MCrowN
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
