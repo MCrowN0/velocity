@@ -1,4 +1,4 @@
-# Velocity
+# Project: Velocity
 
 A game framework in development, written in Rust and built on Vulkan. Currently
 supports Windows, with scenes, input handling, fixed updates, and sprite rendering.
