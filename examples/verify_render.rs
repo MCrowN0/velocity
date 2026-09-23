@@ -21,13 +21,36 @@ fn main() -> Result<(), String> {
         2,
         vec![255, 0, 0, 255, 0, 255, 0, 255],
     )?);
+    assert_eq!(
+        renderer.surface_size(renderer.default_surface)?,
+        [1280, 720]
+    );
+    assert_eq!(
+        renderer.surface_position(renderer.default_surface, vec2(64., 64.))?,
+        vec2(640., 360.)
+    );
+    let mut fallback = Sprite::new(texture.clone());
+    fallback.position = vec2(640., 0.);
+    fallback.size = Some(vec2(320., 320.));
+    renderer.sprites.push(fallback);
+    let (_, frame) = renderer.render_capture()?;
+    pixel(&frame, 128, 72, 36, [255, 0, 0, 255]);
+    pixel(&frame, 128, 72, 52, [0, 255, 0, 255]);
+    let fallback_pixels = renderer.read_surface(renderer.default_surface)?;
+    pixel(&fallback_pixels, 128, 72, 8, [255, 0, 0, 255]);
+    renderer.sprites.clear();
+    renderer.render()?;
     let target = renderer.create_surface(128, 128, vec2(16., 16.))?;
-    for (position, surface) in [(vec2(0., 0.), Some(target)), (vec2(64., 16.), None)] {
+    let canvas = renderer.create_surface(128, 128, vec2(0., 0.))?;
+    for (position, surface) in [(vec2(0., 0.), Some(target)), (vec2(64., 16.), Some(canvas))] {
         let mut sprite = Sprite::new(texture.clone());
         sprite.position = position;
         sprite.size = Some(vec2(32., 32.));
         sprite.surface = surface;
         sprite.color.a = 0.5;
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
+        }
         renderer.sprites.push(sprite);
     }
     for kind in 0..3 {
@@ -36,6 +59,9 @@ fn main() -> Result<(), String> {
             0 => sprite.visible = false,
             1 => sprite.color.a = 0.,
             _ => sprite.position.x = 128.,
+        }
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
         }
         renderer.sprites.push(sprite);
     }
@@ -49,7 +75,7 @@ fn main() -> Result<(), String> {
             stats.texture_uploads,
             stats.draw_calls
         ),
-        (2, 3, 1, 3)
+        (2, 3, 0, 4)
     );
     assert_eq!(renderer.cached_texture_count(), 1);
     for x in [24, 72] {
@@ -78,20 +104,26 @@ fn main() -> Result<(), String> {
         sprite.position = vec2(64., 64.);
         sprite.size = Some(vec2(16., 16.));
         sprite.color = color;
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
+        }
         renderer.sprites.push(sprite);
     }
     let (stats, frame) = renderer.render_capture()?;
-    assert_eq!(stats.draw_calls, 1);
+    assert_eq!(stats.draw_calls, 2);
     pixel(&frame, 128, 68, 68, [64, 128, 64, 255]);
     renderer.sprites.clear();
     for index in 0..10_000 {
         let mut sprite = Sprite::new(white.clone());
         sprite.position = vec2((index % 100) as f32, (index / 100) as f32);
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
+        }
         renderer.sprites.push(sprite);
     }
     for frame in 0..8 {
         let stats = renderer.render()?;
-        assert_eq!((stats.drawn, stats.draw_calls), (10_000, 1));
+        assert_eq!((stats.drawn, stats.draw_calls), (10_000, 2));
         assert_eq!(stats.texture_uploads, 0, "frame {frame}");
     }
     unsafe {
@@ -152,6 +184,9 @@ fn main() -> Result<(), String> {
     for index in 0..300 {
         let mut sprite = Sprite::new(Arc::new(Texture::from_rgba(1, 1, vec![255; 4])?));
         sprite.position = vec2((index % 100) as f32, (index / 100) as f32);
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
+        }
         renderer.sprites.push(sprite);
     }
     assert_eq!(renderer.render()?.texture_uploads, 300);
@@ -228,6 +263,9 @@ fn main() -> Result<(), String> {
         sprite.surface = surface;
         sprite.position = vec2(-10000., -10000.);
         sprite.size = Some(vec2(30000., 30000.));
+        if sprite.surface.is_none() {
+            sprite.surface = Some(canvas);
+        }
         renderer.sprites.push(sprite);
     }
     for (width, height) in [(301, 200), (200, 301), (319, 180), (180, 319)] {

@@ -325,6 +325,8 @@ impl Drop for Swapchain {
 
 pub struct Renderer {
     pub sprites: Vec<Sprite>,
+    /// The 1280×720 logical surface used by sprites with no explicit surface.
+    pub default_surface: Surface,
     pub clear_color: Color,
     device: Rc<Device>,
     window: Window,
@@ -351,12 +353,17 @@ impl Renderer {
         }
         let device = Device::new(window)?;
         device.pipeline(IMAGE_FORMAT)?;
+        let id = NEXT_RENDERER.fetch_add(1, Ordering::Relaxed);
         let mut renderer = Self {
             sprites: Vec::new(),
+            default_surface: Surface {
+                renderer: id,
+                index: 0,
+            },
             clear_color: Color::BLACK,
             device,
             window: window.clone(),
-            id: NEXT_RENDERER.fetch_add(1, Ordering::Relaxed),
+            id,
             vsync,
             canvas_size: window.size(),
             swap: None,
@@ -372,6 +379,7 @@ impl Renderer {
         for _ in 0..FRAMES {
             renderer.frames.push(Frame::new(&renderer.device)?);
         }
+        renderer.default_surface = renderer.create_surface(1280, 720, Vec2::ZERO)?;
         Ok(renderer)
     }
     pub fn gpu_name(&self) -> &str {
@@ -379,6 +387,9 @@ impl Renderer {
     }
     pub fn cached_texture_count(&self) -> usize {
         self.textures.len()
+    }
+    pub fn add_sprite(&mut self, sprite: Sprite) {
+        self.sprites.push(sprite);
     }
     pub fn create_surface(&mut self, width: u16, height: u16, position: Vec2) -> Result<Surface> {
         if width == 0 || height == 0 || !position.is_finite() {
@@ -465,6 +476,7 @@ impl Renderer {
         self.sprites.clear();
         self.surfaces.clear();
         self.id = NEXT_RENDERER.fetch_add(1, Ordering::Relaxed);
+        self.default_surface = self.create_surface(1280, 720, Vec2::ZERO)?;
         Ok(())
     }
     pub fn render(&mut self) -> Result<RenderStats> {
@@ -499,93 +511,75 @@ impl Renderer {
                 .extract_if(|_, cached| cached.source.strong_count() == 0)
                 .map(|(_, cached)| cached.image),
         );
-        for offscreen in [true, false] {
-            if !offscreen {
-                for surface in &self.surfaces {
-                    if surface.visible && !surface.list.instances.is_empty() {
-                        self.window_list.push(
-                            SpriteInstance {
-                                position: surface.origin,
-                                size: vec2(surface.image.width as f32, surface.image.height as f32),
-                                uv: [0., 0., 1., 1.],
-                                color: Color::WHITE,
-                            },
-                            surface.image.descriptor,
-                            true,
-                        );
-                    }
-                }
+        for sprite in &self.sprites {
+            let handle = sprite.surface.unwrap_or(self.default_surface);
+            if handle.renderer != self.id {
+                stats.culled += 1;
+                continue;
             }
-            for sprite in &self.sprites {
-                if sprite.surface.is_some() != offscreen {
-                    continue;
-                }
-                let bounds = match sprite.surface {
-                    None => size,
-                    Some(handle) if handle.renderer == self.id => {
-                        let surface = &self.surfaces[handle.index];
-                        if !surface.visible {
-                            stats.culled += 1;
-                            continue;
-                        }
-                        surface.logical
-                    }
-                    Some(_) => {
-                        stats.culled += 1;
-                        continue;
-                    }
-                };
-                let Some(sprite_size) = drawable_size(sprite, bounds) else {
+            let target = &self.surfaces[handle.index];
+            if !target.visible {
+                stats.culled += 1;
+                continue;
+            }
+            let bounds = target.logical;
+            let Some(sprite_size) = drawable_size(sprite, bounds) else {
+                stats.culled += 1;
+                continue;
+            };
+            {
+                let target = &self.surfaces[handle.index];
+                let origin = target.origin;
+                let local = sprite.position * target.scale;
+                if !intersects(
+                    vec2(origin.x + local.x, origin.y + local.y),
+                    sprite_size * target.scale,
+                    size,
+                ) {
                     stats.culled += 1;
                     continue;
-                };
-                if let Some(handle) = sprite.surface {
-                    let target = &self.surfaces[handle.index];
-                    let origin = target.origin;
-                    let local = sprite.position * target.scale;
-                    if !intersects(
-                        vec2(origin.x + local.x, origin.y + local.y),
-                        sprite_size * target.scale,
-                        size,
-                    ) {
-                        stats.culled += 1;
-                        continue;
-                    }
                 }
-                let key = Arc::as_ptr(&sprite.texture) as usize;
-                let descriptor = match self.textures.entry(key) {
-                    std::collections::hash_map::Entry::Occupied(entry) => {
-                        entry.get().image.descriptor
-                    }
-                    std::collections::hash_map::Entry::Vacant(entry) => {
-                        let image = Image::new(
-                            &self.device,
-                            sprite.texture.width() as u32,
-                            sprite.texture.height() as u32,
-                            false,
-                        )?;
-                        image.upload(sprite.texture.pixels())?;
-                        let descriptor = image.descriptor;
-                        entry.insert(CachedTexture {
-                            source: Arc::downgrade(&sprite.texture),
-                            image,
-                        });
-                        stats.texture_uploads += 1;
-                        stats.uploaded_bytes += sprite.texture.pixels().len();
-                        descriptor
-                    }
-                };
-                let mut instance = SpriteInstance::sprite(sprite);
-                if let Some(handle) = sprite.surface {
-                    instance.position = instance.position * self.surfaces[handle.index].scale;
-                    instance.size = instance.size * self.surfaces[handle.index].scale;
+            }
+            let key = Arc::as_ptr(&sprite.texture) as usize;
+            let descriptor = match self.textures.entry(key) {
+                std::collections::hash_map::Entry::Occupied(entry) => entry.get().image.descriptor,
+                std::collections::hash_map::Entry::Vacant(entry) => {
+                    let image = Image::new(
+                        &self.device,
+                        sprite.texture.width() as u32,
+                        sprite.texture.height() as u32,
+                        false,
+                    )?;
+                    image.upload(sprite.texture.pixels())?;
+                    let descriptor = image.descriptor;
+                    entry.insert(CachedTexture {
+                        source: Arc::downgrade(&sprite.texture),
+                        image,
+                    });
+                    stats.texture_uploads += 1;
+                    stats.uploaded_bytes += sprite.texture.pixels().len();
+                    descriptor
                 }
-                let list = match sprite.surface {
-                    Some(handle) => &mut self.surfaces[handle.index].list,
-                    None => &mut self.window_list,
-                };
-                list.push(instance, descriptor, false);
-                stats.drawn += 1;
+            };
+            let mut instance = SpriteInstance::sprite(sprite);
+            instance.position = instance.position * self.surfaces[handle.index].scale;
+            instance.size = instance.size * self.surfaces[handle.index].scale;
+            let list = &mut self.surfaces[handle.index].list;
+            list.push(instance, descriptor, false);
+            stats.drawn += 1;
+        }
+        for surface in &self.surfaces {
+            if surface.visible && !surface.list.instances.is_empty() {
+                self.window_list.push(
+                    SpriteInstance {
+                        position: surface.origin,
+                        size: vec2(surface.image.width as f32, surface.image.height as f32),
+                        uv: [0., 0., 1., 1.],
+                        color: Color::WHITE,
+                    },
+                    surface.image.descriptor,
+                    true,
+                );
             }
         }
         self.instance_bytes = 0;

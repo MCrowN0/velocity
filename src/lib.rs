@@ -1,4 +1,6 @@
+pub mod audio;
 mod renderer;
+pub use audio::{AudioBackend, AudioEngine, AudioLoadMode, AudioPlayer, AudioSource, play_audio};
 mod vulkan;
 pub mod window;
 use image::GenericImageView;
@@ -92,6 +94,7 @@ pub struct Sprite {
     pub size: Option<Vec2>,
     pub visible: bool,
     pub color: Color,
+    /// `None` renders to `Renderer::default_surface`.
     pub surface: Option<Surface>,
 }
 impl Sprite {
@@ -105,6 +108,9 @@ impl Sprite {
             color: Color::WHITE,
             surface: None,
         }
+    }
+    pub fn set_position(&mut self, position: Vec2) {
+        self.position = position;
     }
     pub(crate) fn signed_size(&self) -> Vec2 {
         self.size

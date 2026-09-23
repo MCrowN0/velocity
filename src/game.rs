@@ -1,4 +1,4 @@
-use crate::{Renderer, Vec2, Window, vec2};
+use crate::{AudioEngine, Renderer, Vec2, Window, vec2};
 use std::{
     cell::RefCell,
     sync::{
@@ -29,12 +29,26 @@ struct Snapshot {
 }
 #[derive(Default)]
 struct Context {
+    audio: Option<Arc<AudioEngine>>,
     input: Snapshot,
     next: Option<Box<dyn Scene>>,
     quit: bool,
     active: bool,
 }
 thread_local! { static CONTEXT: RefCell<Context> = RefCell::new(Context::default()); }
+
+pub(crate) fn with_audio<T>(
+    f: impl FnOnce(&AudioEngine) -> Result<T, String>,
+) -> Result<T, String> {
+    CONTEXT.with(|c| {
+        let engine = c
+            .borrow()
+            .audio
+            .clone()
+            .ok_or("play_audio requires a scene callback")?;
+        f(&engine)
+    })
+}
 
 pub fn get_fps() -> f32 {
     CONTEXT.with(|c| c.borrow().input.fps)
@@ -67,6 +81,7 @@ pub fn quit() {
 }
 
 struct Runtime {
+    audio: Option<Arc<AudioEngine>>,
     scene: Box<dyn Scene>,
     input: Snapshot,
     next: Option<Box<dyn Scene>>,
@@ -80,6 +95,7 @@ impl Runtime {
         }
         CONTEXT.with(|c| {
             *c.borrow_mut() = Context {
+                audio: self.audio.clone(),
                 input,
                 active: true,
                 ..Context::default()
@@ -164,6 +180,7 @@ impl Drop for Worker {
 }
 
 pub struct Game {
+    pub audio: AudioEngine,
     pub title: String,
     /// Initial client size and fixed canvas aspect ratio, preserved on resize.
     pub canvas_size: [u32; 2],
@@ -174,6 +191,7 @@ pub struct Game {
 impl Game {
     pub fn new(initial_scene: impl Scene) -> Self {
         Self {
+            audio: AudioEngine::new(),
             title: "Velocity".into(),
             canvas_size: [1280, 720],
             resizable: true,
@@ -181,14 +199,16 @@ impl Game {
             initial_scene: Box::new(initial_scene),
         }
     }
-    pub fn run(self) -> Result<(), String> {
+    pub fn run(mut self) -> Result<(), String> {
         if self.max_framerate != -1 && self.max_framerate <= 0 {
             return Err("max_framerate must be -1 or positive".into());
         }
         let window = Window::new(&self.title, self.canvas_size[0], self.canvas_size[1])?;
         window.set_resizable(self.resizable);
         let mut renderer = Renderer::with_vsync(&window, false)?;
+        self.audio.start()?;
         let runtime = Arc::new(Mutex::new(Runtime {
+            audio: Some(Arc::new(self.audio)),
             scene: self.initial_scene,
             input: Snapshot::default(),
             next: None,
@@ -221,6 +241,9 @@ impl Game {
                 }
                 {
                     let mut state = runtime.lock().map_err(|_| "scene callback panicked")?;
+                    if let Some(error) = state.audio.as_ref().and_then(|audio| audio.error()) {
+                        return Err(format!("audio output failed: {error}"));
+                    }
                     state.input = input;
                     if state.quit {
                         break;
@@ -267,6 +290,7 @@ mod tests {
     impl Scene for Empty {}
     fn runtime() -> Runtime {
         Runtime {
+            audio: None,
             scene: Box::new(Empty),
             input: Snapshot::default(),
             next: None,

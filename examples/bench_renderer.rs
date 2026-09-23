@@ -33,7 +33,7 @@ fn main() -> Result<(), String> {
         let elapsed = start.elapsed();
         assert_eq!(
             (stats.drawn, stats.culled, stats.draw_calls),
-            (count, count * 3, 1)
+            (count, count * 3, 2)
         );
         if frame > 0 {
             assert_eq!(stats.texture_uploads, 0);
@@ -45,12 +45,12 @@ fn main() -> Result<(), String> {
     samples.sort_by(f64::total_cmp);
     //MESSY AS FUCK
     println!(
-        "{{\"gpu\":\"{}\",\"visible\":{count},\"culled\":{},\"draw_calls\":1,\"median_ms\":{},\"p95_ms\":{},\"instance_bytes\":{}}}",
+        "{{\"gpu\":\"{}\",\"visible\":{count},\"culled\":{},\"draw_calls\":2,\"median_ms\":{},\"p95_ms\":{},\"instance_bytes\":{}}}",
         renderer.gpu_name(),
         count * 3,
         samples[300],
         samples[570],
-        count * 48
+        (count + 1) * 48
     );
     Ok(())
 }
