@@ -4,14 +4,7 @@ A game framework in development, written in Rust and built on Vulkan. Currently
 supports Windows, with scenes, input handling, fixed updates, and sprite rendering.
 Requires a Vulkan 1.3 driver with dynamic rendering.
 
-The framework lives in `src/`; the demo and its assets live in `examples/demo/`.
-Run the demo with:
-
-```powershell
-cargo run --release --example demo
-```
-
-Pass a frame count for a short run: `cargo run --release --example demo -- 120`.
+The framework lives in `src/`.
 
 ## Scenes
 
