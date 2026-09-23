@@ -53,7 +53,7 @@ surfaces. Keep shared textures in your own data to reuse them. Set
   background defaults to black; `renderer.clear_color` changes only the canvas.
 - Surfaces provide logical coordinates and fit the canvas while keeping their
   aspect ratio. They draw beneath canvas sprites, in creation order. Direct
-  sprites use physical pixels relative to the fitted canvas�s top-left corner.
+  sprites use physical pixels relative to the fitted canvas's top-left corner.
   A standalone `Renderer` captures its canvas ratio from the window at creation.
 - Mouse positions use physical window pixels. Use `renderer.surface_position`
   to convert them to surface coordinates.
