@@ -18,6 +18,7 @@ quick-error = "2"
 yuv = "0.1.10"
 wasapi = "0.24.0"
 symphonia = { version = "0.5.5", features = ["all"] }
+quick-xml = "0.38"
 
 [build-dependencies]
 naga = { version = "0.19", features = ["wgsl-in", "spv-out"] }

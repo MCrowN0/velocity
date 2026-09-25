@@ -35,6 +35,7 @@ pub(crate) struct Device {
     pub properties: vk::PhysicalDeviceProperties,
     memory: vk::PhysicalDeviceMemoryProperties,
     pub sampler: vk::Sampler,
+    nearest_sampler: vk::Sampler,
     pub descriptor_layout: vk::DescriptorSetLayout,
     pub pipeline_layout: vk::PipelineLayout,
     upload_pool: vk::CommandPool,
@@ -164,6 +165,7 @@ impl Device {
                 properties,
                 memory,
                 sampler: vk::Sampler::null(),
+                nearest_sampler: vk::Sampler::null(),
                 descriptor_layout: vk::DescriptorSetLayout::null(),
                 pipeline_layout: vk::PipelineLayout::null(),
                 upload_pool: vk::CommandPool::null(),
@@ -171,6 +173,18 @@ impl Device {
                 pipelines: RefCell::new(HashMap::new()),
             };
             device.sampler = device
+                .raw
+                .create_sampler(
+                    &vk::SamplerCreateInfo::default()
+                        .mag_filter(vk::Filter::LINEAR)
+                        .min_filter(vk::Filter::LINEAR)
+                        .address_mode_u(vk::SamplerAddressMode::CLAMP_TO_EDGE)
+                        .address_mode_v(vk::SamplerAddressMode::CLAMP_TO_EDGE)
+                        .address_mode_w(vk::SamplerAddressMode::CLAMP_TO_EDGE),
+                    None,
+                )
+                .map_err(error)?;
+            device.nearest_sampler = device
                 .raw
                 .create_sampler(
                     &vk::SamplerCreateInfo::default()
@@ -254,7 +268,11 @@ impl Device {
             })
             .ok_or_else(|| "no suitable Vulkan memory type".into())
     }
-    fn descriptor(&self, view: vk::ImageView) -> Result<(vk::DescriptorPool, vk::DescriptorSet)> {
+    fn descriptor(
+        &self,
+        view: vk::ImageView,
+        sampler: vk::Sampler,
+    ) -> Result<(vk::DescriptorPool, vk::DescriptorSet)> {
         unsafe {
             let mut pools = self.descriptors.borrow_mut();
             let layouts = [self.descriptor_layout];
@@ -313,7 +331,7 @@ impl Device {
             let image = [vk::DescriptorImageInfo::default()
                 .image_view(view)
                 .image_layout(vk::ImageLayout::SHADER_READ_ONLY_OPTIMAL)];
-            let sampler = [vk::DescriptorImageInfo::default().sampler(self.sampler)];
+            let sampler = [vk::DescriptorImageInfo::default().sampler(sampler)];
             self.raw.update_descriptor_sets(
                 &[
                     vk::WriteDescriptorSet::default()
@@ -510,6 +528,7 @@ impl Drop for Device {
             self.raw
                 .destroy_descriptor_set_layout(self.descriptor_layout, None);
             self.raw.destroy_sampler(self.sampler, None);
+            self.raw.destroy_sampler(self.nearest_sampler, None);
             self.raw.destroy_device(None);
         }
     }
@@ -604,6 +623,8 @@ pub(crate) struct Image {
     memory: vk::DeviceMemory,
     pool: vk::DescriptorPool,
     pub descriptor: vk::DescriptorSet,
+    nearest_pool: vk::DescriptorPool,
+    nearest_descriptor: vk::DescriptorSet,
     pub width: u32,
     pub height: u32,
 }
@@ -633,6 +654,8 @@ impl Image {
                 memory: vk::DeviceMemory::null(),
                 pool: vk::DescriptorPool::null(),
                 descriptor: vk::DescriptorSet::null(),
+                nearest_pool: vk::DescriptorPool::null(),
+                nearest_descriptor: vk::DescriptorSet::null(),
                 width,
                 height,
             };
@@ -689,8 +712,16 @@ impl Image {
                     None,
                 )
                 .map_err(error)?;
-            (image.pool, image.descriptor) = device.descriptor(image.view)?;
+            (image.pool, image.descriptor) = device.descriptor(image.view, device.sampler)?;
+            (image.nearest_pool, image.nearest_descriptor) =
+                device.descriptor(image.view, device.nearest_sampler)?;
             Ok(image)
+        }
+    }
+    pub fn filtered_descriptor(&self, filter: crate::TextureFilter) -> vk::DescriptorSet {
+        match filter {
+            crate::TextureFilter::Linear => self.descriptor,
+            crate::TextureFilter::Nearest => self.nearest_descriptor,
         }
     }
     pub fn upload(&self, bytes: &[u8]) -> Result<()> {
@@ -773,6 +804,12 @@ impl Image {
 impl Drop for Image {
     fn drop(&mut self) {
         unsafe {
+            if self.nearest_descriptor != vk::DescriptorSet::null() {
+                let _ = self
+                    .device
+                    .raw
+                    .free_descriptor_sets(self.nearest_pool, &[self.nearest_descriptor]);
+            }
             if self.descriptor != vk::DescriptorSet::null() {
                 let _ = self
                     .device

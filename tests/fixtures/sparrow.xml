@@ -1,0 +1,518 @@
+<?xml version="1.0"?><TextureAtlas imagePath="atlas.png">
+<SubTexture name="case0000" x="86.25" y="-4" width="1" height="39" rotated="true" flipX="true" flipY="true" frameX="-19" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0001" x="62" y="15" width="11" height="32" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0002" x="100" y="0" width="9" height="36" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0003" x="101" y="-5" width="1" height="8" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0004" x="109" y="-2" width="11" height="21" rotated="true" flipX="false" flipY="false" frameX="-2" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0005" x="40" y="90" width="44" height="36" rotated="false" flipX="false" flipY="true" frameX="-9" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0006" x="-5" y="96" width="17" height="21" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0007" x="-18.75" y="20" width="10" height="33" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0008" x="66" y="66" width="22" height="38" rotated="true" flipX="false" flipY="false" frameX="-20" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0009" x="62" y="74" width="19" height="10" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0010" x="104" y="14" width="28" height="5" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0011" x="102" y="12" width="10" height="39" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0012" x="22" y="96" width="18" height="30" rotated="true" flipX="true" flipY="false" frameX="-12" frameY="0" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0013" x="5" y="73" width="24" height="27" rotated="false" flipX="false" flipY="false" frameX="-24" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0014" x="38.25" y="43" width="14" height="6" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0015" x="138" y="37" width="26" height="34" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0016" x="87" y="8" width="15" height="23" rotated="true" flipX="false" flipY="false" frameX="-8" frameY="-28" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0017" x="77" y="-10" width="19" height="3" rotated="false" flipX="false" flipY="false" frameX="-29" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0018" x="5" y="34" width="0" height="1" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0019" x="122" y="34" width="38" height="36" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0020" x="32" y="81" width="16" height="27" rotated="true" flipX="false" flipY="true" frameX="-26" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0021" x="88.25" y="25" width="15" height="10" rotated="false" flipX="true" flipY="false" frameX="-22" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0022" x="-19" y="44" width="24" height="40" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0023" x="8" y="90" width="31" height="39" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0024" x="36" y="39" width="23" height="18" rotated="true" flipX="true" flipY="false" frameX="-2" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0025" x="119" y="68" width="9" height="1" rotated="false" flipX="false" flipY="true" frameX="4" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0026" x="-8" y="45" width="29" height="8" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0027" x="33" y="8" width="20" height="23" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0028" x="16.25" y="20" width="6" height="13" rotated="true" flipX="false" flipY="false" frameX="-24" frameY="-24" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0029" x="137" y="-18" width="18" height="17" rotated="false" flipX="false" flipY="false" frameX="-10" frameY="-17" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0030" x="4" y="87" width="42" height="11" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0031" x="128" y="-3" width="8" height="4" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0032" x="19" y="-11" width="36" height="23" rotated="true" flipX="false" flipY="false" frameX="-1" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0033" x="92" y="90" width="11" height="17" rotated="false" flipX="true" flipY="false" frameX="-21" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0034" x="122" y="89" width="10" height="12" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0035" x="117.25" y="52" width="28" height="25" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0036" x="14" y="89" width="30" height="6" rotated="true" flipX="true" flipY="false" frameX="-2" frameY="-10" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0037" x="47" y="44" width="25" height="3" rotated="false" flipX="false" flipY="false" frameX="-14" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0038" x="136" y="100" width="27" height="11" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0039" x="44" y="77" width="8" height="1" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0040" x="146" y="43" width="2" height="21" rotated="true" flipX="false" flipY="true" frameX="-24" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0041" x="82" y="1" width="8" height="9" rotated="false" flipX="false" flipY="false" frameX="-15" frameY="-22" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0042" x="36.25" y="64" width="14" height="22" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0043" x="106" y="-7" width="18" height="33" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0044" x="41" y="78" width="13" height="17" rotated="true" flipX="false" flipY="false" frameX="-14" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0045" x="25" y="37" width="5" height="29" rotated="false" flipX="true" flipY="true" frameX="-22" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0046" x="61" y="-11" width="5" height="8" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0047" x="147" y="-7" width="15" height="14" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0048" x="15" y="58" width="0" height="20" rotated="true" flipX="true" flipY="false" frameX="-26" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0049" x="84.25" y="30" width="9" height="40" rotated="false" flipX="false" flipY="false" frameX="-29" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0050" x="115" y="-13" width="36" height="28" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0051" x="110" y="39" width="5" height="2" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0052" x="18" y="38" width="12" height="19" rotated="true" flipX="false" flipY="false" frameX="-11" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0053" x="32" y="66" width="27" height="27" rotated="false" flipX="false" flipY="false" frameX="-14" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0054" x="-18" y="10" width="17" height="27" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0055" x="147" y="-5" width="37" height="30" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0056" x="94.25" y="-18" width="21" height="0" rotated="true" flipX="false" flipY="false" frameX="-11" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0057" x="40" y="27" width="28" height="28" rotated="false" flipX="true" flipY="false" frameX="2" frameY="-15" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0058" x="104" y="27" width="31" height="21" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0059" x="15" y="2" width="42" height="5" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0060" x="142" y="66" width="17" height="36" rotated="true" flipX="true" flipY="true" frameX="-14" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0061" x="-14" y="88" width="1" height="17" rotated="false" flipX="false" flipY="false" frameX="1" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0062" x="10" y="2" width="17" height="33" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0063" x="12.25" y="52" width="43" height="10" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0064" x="3" y="90" width="7" height="11" rotated="true" flipX="false" flipY="false" frameX="-12" frameY="-28" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0065" x="53" y="61" width="0" height="5" rotated="false" flipX="false" flipY="true" frameX="-28" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0066" x="102" y="-7" width="45" height="34" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0067" x="-11" y="10" width="14" height="29" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0068" x="37" y="91" width="35" height="29" rotated="true" flipX="false" flipY="false" frameX="-12" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0069" x="57" y="62" width="4" height="33" rotated="false" flipX="true" flipY="false" frameX="-7" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0070" x="6.25" y="96" width="15" height="29" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0071" x="29" y="-1" width="45" height="22" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0072" x="35" y="26" width="21" height="0" rotated="true" flipX="true" flipY="false" frameX="-11" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0073" x="27" y="36" width="30" height="11" rotated="false" flipX="false" flipY="false" frameX="-16" frameY="-15" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0074" x="4" y="90" width="14" height="34" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0075" x="-17" y="37" width="5" height="28" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0076" x="10" y="94" width="0" height="38" rotated="true" flipX="false" flipY="false" frameX="-17" frameY="-22" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0077" x="69.25" y="50" width="1" height="29" rotated="false" flipX="false" flipY="false" frameX="-9" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0078" x="69" y="85" width="16" height="40" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0079" x="88" y="80" width="14" height="29" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0080" x="8" y="58" width="8" height="19" rotated="true" flipX="false" flipY="true" frameX="-24" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0081" x="105" y="90" width="20" height="27" rotated="false" flipX="true" flipY="false" frameX="-24" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0082" x="53" y="68" width="5" height="10" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0083" x="104" y="32" width="41" height="32" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0084" x="45.25" y="55" width="3" height="22" rotated="true" flipX="true" flipY="false" frameX="-1" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0085" x="73" y="80" width="31" height="14" rotated="false" flipX="false" flipY="true" frameX="-23" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0086" x="87" y="43" width="7" height="38" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0087" x="5" y="64" width="44" height="16" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0088" x="-13" y="19" width="34" height="25" rotated="true" flipX="false" flipY="false" frameX="-21" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0089" x="144" y="19" width="23" height="33" rotated="false" flipX="false" flipY="false" frameX="-25" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0090" x="116" y="36" width="50" height="6" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0091" x="-6.75" y="30" width="42" height="0" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0092" x="1" y="71" width="38" height="2" rotated="true" flipX="false" flipY="false" frameX="-26" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0093" x="69" y="9" width="10" height="27" rotated="false" flipX="true" flipY="false" frameX="1" frameY="-10" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0094" x="-11" y="0" width="22" height="26" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0095" x="46" y="94" width="33" height="20" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0096" x="108" y="-10" width="17" height="30" rotated="true" flipX="true" flipY="false" frameX="-9" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0097" x="86" y="-13" width="44" height="6" rotated="false" flipX="false" flipY="false" frameX="-4" frameY="-17" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0098" x="68.25" y="96" width="17" height="17" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0099" x="142" y="89" width="7" height="2" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0100" x="72" y="3" width="33" height="22" rotated="true" flipX="false" flipY="true" frameX="-21" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0101" x="66" y="77" width="1" height="6" rotated="false" flipX="false" flipY="false" frameX="-21" frameY="-10" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0102" x="33" y="67" width="29" height="16" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0103" x="1" y="40" width="45" height="3" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0104" x="19" y="86" width="39" height="4" rotated="true" flipX="false" flipY="false" frameX="-26" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0105" x="-9.75" y="85" width="36" height="26" rotated="false" flipX="true" flipY="true" frameX="2" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0106" x="131" y="93" width="25" height="7" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0107" x="145" y="83" width="1" height="28" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0108" x="118" y="71" width="21" height="17" rotated="true" flipX="true" flipY="false" frameX="-2" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0109" x="130" y="0" width="18" height="26" rotated="false" flipX="false" flipY="false" frameX="-16" frameY="-26" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0110" x="80" y="76" width="2" height="29" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0111" x="72" y="59" width="32" height="0" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0112" x="129.25" y="-8" width="6" height="0" rotated="true" flipX="false" flipY="false" frameX="5" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0113" x="49" y="-6" width="16" height="14" rotated="false" flipX="false" flipY="false" frameX="-2" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0114" x="97" y="2" width="15" height="6" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0115" x="92" y="98" width="44" height="24" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0116" x="67" y="34" width="0" height="34" rotated="true" flipX="false" flipY="false" frameX="-7" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0117" x="-16" y="91" width="18" height="14" rotated="false" flipX="true" flipY="false" frameX="-3" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0118" x="67" y="64" width="30" height="33" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0119" x="64.25" y="48" width="14" height="8" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0120" x="-10" y="17" width="40" height="39" rotated="true" flipX="true" flipY="true" frameX="-1" frameY="-1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0121" x="-16" y="-2" width="17" height="16" rotated="false" flipX="false" flipY="false" frameX="-5" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0122" x="93" y="63" width="18" height="3" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0123" x="16" y="100" width="31" height="3" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0124" x="15" y="19" width="40" height="30" rotated="true" flipX="false" flipY="false" frameX="-11" frameY="-2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0125" x="74" y="78" width="11" height="21" rotated="false" flipX="false" flipY="true" frameX="-24" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0126" x="49.25" y="98" width="29" height="19" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0127" x="112" y="35" width="30" height="1" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0128" x="74" y="-7" width="49" height="30" rotated="true" flipX="false" flipY="false" frameX="-30" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0129" x="8" y="-18" width="10" height="37" rotated="false" flipX="true" flipY="false" frameX="-27" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0130" x="70" y="52" width="21" height="2" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0131" x="7" y="-14" width="10" height="4" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0132" x="26" y="40" width="20" height="5" rotated="true" flipX="true" flipY="false" frameX="-9" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0133" x="149.25" y="100" width="13" height="20" rotated="false" flipX="false" flipY="false" frameX="-17" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0134" x="94" y="80" width="46" height="38" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0135" x="7" y="97" width="18" height="2" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0136" x="-12" y="99" width="20" height="18" rotated="true" flipX="false" flipY="false" frameX="-5" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0137" x="126" y="81" width="44" height="16" rotated="false" flipX="false" flipY="false" frameX="-14" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0138" x="107" y="31" width="44" height="38" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0139" x="61" y="97" width="44" height="14" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0140" x="35.25" y="23" width="39" height="18" rotated="true" flipX="false" flipY="true" frameX="-30" frameY="-24" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0141" x="117" y="-12" width="17" height="38" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="-24" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0142" x="81" y="87" width="36" height="27" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0143" x="80" y="64" width="22" height="39" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0144" x="49" y="60" width="4" height="1" rotated="true" flipX="true" flipY="false" frameX="-2" frameY="-9" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0145" x="141" y="62" width="33" height="4" rotated="false" flipX="false" flipY="true" frameX="-20" frameY="-1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0146" x="-10" y="45" width="47" height="40" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0147" x="-16.75" y="41" width="0" height="9" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0148" x="-14" y="78" width="9" height="34" rotated="true" flipX="false" flipY="false" frameX="5" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0149" x="58" y="19" width="31" height="0" rotated="false" flipX="false" flipY="false" frameX="-19" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0150" x="-15" y="32" width="19" height="27" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0151" x="149" y="85" width="30" height="16" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0152" x="52" y="90" width="32" height="20" rotated="true" flipX="false" flipY="false" frameX="-26" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0153" x="42" y="-20" width="15" height="37" rotated="false" flipX="true" flipY="false" frameX="-18" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0154" x="84.25" y="38" width="15" height="39" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0155" x="16" y="40" width="2" height="30" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0156" x="124" y="11" width="35" height="3" rotated="true" flipX="true" flipY="false" frameX="-4" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0157" x="63" y="6" width="4" height="34" rotated="false" flipX="false" flipY="false" frameX="-7" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0158" x="2" y="89" width="20" height="36" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0159" x="53" y="18" width="37" height="37" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0160" x="42" y="8" width="0" height="5" rotated="true" flipX="false" flipY="true" frameX="-7" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0161" x="-2.75" y="77" width="47" height="31" rotated="false" flipX="false" flipY="false" frameX="1" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0162" x="2" y="-6" width="47" height="21" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0163" x="-16" y="75" width="2" height="11" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0164" x="84" y="88" width="20" height="5" rotated="true" flipX="false" flipY="false" frameX="1" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0165" x="137" y="59" width="19" height="38" rotated="false" flipX="true" flipY="true" frameX="4" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0166" x="37" y="30" width="33" height="7" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0167" x="139" y="58" width="1" height="34" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0168" x="86.25" y="90" width="10" height="32" rotated="true" flipX="true" flipY="false" frameX="-20" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0169" x="51" y="57" width="48" height="8" rotated="false" flipX="false" flipY="false" frameX="-18" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0170" x="23" y="17" width="42" height="21" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0171" x="52" y="-1" width="28" height="14" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0172" x="142" y="24" width="22" height="28" rotated="true" flipX="false" flipY="false" frameX="-13" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0173" x="138" y="65" width="25" height="24" rotated="false" flipX="false" flipY="false" frameX="-1" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0174" x="116" y="92" width="38" height="29" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0175" x="-3.75" y="57" width="50" height="29" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0176" x="117" y="44" width="24" height="33" rotated="true" flipX="false" flipY="false" frameX="-25" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0177" x="13" y="60" width="43" height="12" rotated="false" flipX="true" flipY="false" frameX="2" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0178" x="137" y="52" width="32" height="8" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0179" x="14" y="-13" width="0" height="10" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0180" x="-19" y="55" width="25" height="10" rotated="true" flipX="true" flipY="true" frameX="-18" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0181" x="44" y="49" width="15" height="7" rotated="false" flipX="false" flipY="false" frameX="-8" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0182" x="-0.75" y="32" width="30" height="1" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0183" x="117" y="19" width="20" height="10" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0184" x="85" y="45" width="14" height="6" rotated="true" flipX="false" flipY="false" frameX="-4" frameY="-10" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0185" x="114" y="22" width="46" height="10" rotated="false" flipX="false" flipY="true" frameX="-15" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0186" x="38" y="2" width="46" height="25" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0187" x="131" y="-15" width="37" height="15" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0188" x="71" y="63" width="21" height="23" rotated="true" flipX="false" flipY="false" frameX="-8" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0189" x="-18.75" y="-16" width="17" height="18" rotated="false" flipX="true" flipY="false" frameX="-12" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0190" x="58" y="55" width="41" height="15" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0191" x="148" y="46" width="21" height="24" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0192" x="136" y="-9" width="14" height="38" rotated="true" flipX="true" flipY="false" frameX="-16" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0193" x="94" y="25" width="31" height="35" rotated="false" flipX="false" flipY="false" frameX="-25" frameY="-26" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0194" x="136" y="-14" width="24" height="33" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0195" x="-14" y="-7" width="32" height="22" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0196" x="130.25" y="26" width="35" height="9" rotated="true" flipX="false" flipY="false" frameX="-11" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0197" x="112" y="80" width="20" height="7" rotated="false" flipX="false" flipY="false" frameX="-29" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0198" x="54" y="22" width="8" height="38" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0199" x="18" y="-2" width="11" height="34" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0200" x="-19" y="69" width="7" height="17" rotated="true" flipX="false" flipY="true" frameX="-22" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0201" x="147" y="12" width="4" height="16" rotated="false" flipX="true" flipY="false" frameX="-11" frameY="-15" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0202" x="140" y="86" width="28" height="35" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0203" x="3.25" y="44" width="5" height="25" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0204" x="97" y="91" width="15" height="25" rotated="true" flipX="true" flipY="false" frameX="-29" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0205" x="142" y="30" width="38" height="23" rotated="false" flipX="false" flipY="true" frameX="4" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0206" x="6" y="57" width="22" height="4" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0207" x="-1" y="75" width="27" height="10" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0208" x="104" y="4" width="6" height="40" rotated="true" flipX="false" flipY="false" frameX="-11" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0209" x="137" y="46" width="4" height="12" rotated="false" flipX="false" flipY="false" frameX="-12" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0210" x="81.25" y="27" width="49" height="16" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0211" x="121" y="65" width="11" height="1" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0212" x="77" y="13" width="37" height="2" rotated="true" flipX="false" flipY="false" frameX="-2" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0213" x="102" y="48" width="39" height="27" rotated="false" flipX="true" flipY="false" frameX="-5" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0214" x="-10" y="67" width="27" height="27" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0215" x="40" y="11" width="24" height="27" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0216" x="143" y="54" width="25" height="30" rotated="true" flipX="true" flipY="false" frameX="5" frameY="-28" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0217" x="-0.75" y="86" width="38" height="7" rotated="false" flipX="false" flipY="false" frameX="-3" frameY="-9" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0218" x="78" y="-13" width="31" height="11" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0219" x="57" y="41" width="30" height="36" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0220" x="15" y="11" width="18" height="1" rotated="true" flipX="false" flipY="true" frameX="-4" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0221" x="90" y="48" width="25" height="40" rotated="false" flipX="false" flipY="false" frameX="2" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0222" x="66" y="68" width="15" height="7" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0223" x="135" y="87" width="44" height="33" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0224" x="-5.75" y="37" width="41" height="9" rotated="true" flipX="false" flipY="false" frameX="-4" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0225" x="91" y="49" width="34" height="27" rotated="false" flipX="true" flipY="true" frameX="-9" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0226" x="4" y="32" width="37" height="22" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0227" x="5" y="86" width="5" height="16" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0228" x="119" y="65" width="1" height="28" rotated="true" flipX="true" flipY="false" frameX="-6" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0229" x="103" y="8" width="40" height="5" rotated="false" flipX="false" flipY="false" frameX="0" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0230" x="59" y="75" width="6" height="14" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0231" x="134.25" y="-3" width="36" height="3" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0232" x="96" y="97" width="12" height="19" rotated="true" flipX="false" flipY="false" frameX="-23" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0233" x="24" y="28" width="33" height="31" rotated="false" flipX="false" flipY="false" frameX="-3" frameY="-26" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0234" x="59" y="92" width="33" height="12" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0235" x="77" y="60" width="34" height="27" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0236" x="82" y="75" width="6" height="1" rotated="true" flipX="false" flipY="false" frameX="-12" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0237" x="145" y="20" width="27" height="19" rotated="false" flipX="true" flipY="false" frameX="5" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0238" x="84.25" y="84" width="24" height="11" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0239" x="78" y="99" width="36" height="14" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0240" x="84" y="3" width="26" height="31" rotated="true" flipX="true" flipY="true" frameX="4" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0241" x="6" y="86" width="7" height="36" rotated="false" flipX="false" flipY="false" frameX="-14" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0242" x="100" y="-12" width="43" height="6" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0243" x="134" y="75" width="38" height="39" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0244" x="93" y="-18" width="13" height="6" rotated="true" flipX="false" flipY="false" frameX="-6" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0245" x="37.25" y="-1" width="32" height="2" rotated="false" flipX="false" flipY="true" frameX="-16" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0246" x="110" y="26" width="36" height="35" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0247" x="102" y="67" width="40" height="26" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0248" x="33" y="89" width="26" height="33" rotated="true" flipX="false" flipY="false" frameX="-3" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0249" x="45" y="66" width="29" height="6" rotated="false" flipX="true" flipY="false" frameX="-4" frameY="-24" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0250" x="31" y="61" width="30" height="36" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0251" x="139" y="72" width="31" height="9" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0252" x="-17.75" y="-4" width="27" height="20" rotated="true" flipX="true" flipY="false" frameX="-6" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0253" x="14" y="72" width="6" height="2" rotated="false" flipX="false" flipY="false" frameX="-15" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0254" x="55" y="-9" width="21" height="22" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0255" x="23" y="28" width="0" height="0" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0256" x="42" y="10" width="28" height="25" rotated="true" flipX="false" flipY="false" frameX="-27" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0257" x="115" y="36" width="26" height="21" rotated="false" flipX="false" flipY="false" frameX="1" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0258" x="4" y="52" width="31" height="17" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0259" x="100.25" y="84" width="10" height="6" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0260" x="20" y="75" width="42" height="7" rotated="true" flipX="false" flipY="true" frameX="-28" frameY="-13" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0261" x="102" y="-2" width="19" height="2" rotated="false" flipX="true" flipY="false" frameX="3" frameY="-15" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0262" x="25" y="98" width="37" height="5" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0263" x="113" y="79" width="27" height="3" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0264" x="81" y="4" width="28" height="15" rotated="true" flipX="true" flipY="false" frameX="-4" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0265" x="67" y="30" width="7" height="36" rotated="false" flipX="false" flipY="true" frameX="-8" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0266" x="90.25" y="79" width="44" height="13" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0267" x="94" y="58" width="28" height="29" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0268" x="92" y="30" width="8" height="40" rotated="true" flipX="false" flipY="false" frameX="-15" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0269" x="-18" y="67" width="20" height="5" rotated="false" flipX="false" flipY="false" frameX="-27" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0270" x="31" y="97" width="37" height="21" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0271" x="27" y="-6" width="18" height="15" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0272" x="107" y="97" width="38" height="10" rotated="true" flipX="false" flipY="false" frameX="-30" frameY="-13" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0273" x="37.25" y="88" width="40" height="33" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0274" x="6" y="13" width="38" height="12" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0275" x="79" y="69" width="7" height="31" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0276" x="-18" y="-17" width="21" height="13" rotated="true" flipX="true" flipY="false" frameX="-17" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0277" x="15" y="34" width="28" height="1" rotated="false" flipX="false" flipY="false" frameX="0" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0278" x="31" y="11" width="11" height="31" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0279" x="97" y="94" width="19" height="27" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0280" x="47.25" y="55" width="48" height="28" rotated="true" flipX="false" flipY="true" frameX="-27" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0281" x="61" y="76" width="50" height="16" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="-17" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0282" x="-19" y="86" width="42" height="26" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0283" x="21" y="-1" width="13" height="0" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0284" x="-3" y="45" width="23" height="22" rotated="true" flipX="false" flipY="false" frameX="-30" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0285" x="84" y="9" width="25" height="18" rotated="false" flipX="true" flipY="true" frameX="0" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0286" x="106" y="88" width="9" height="15" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0287" x="106.25" y="75" width="20" height="29" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0288" x="9" y="53" width="9" height="12" rotated="true" flipX="true" flipY="false" frameX="-2" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0289" x="69" y="99" width="16" height="27" rotated="false" flipX="false" flipY="false" frameX="-24" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0290" x="139" y="83" width="12" height="29" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0291" x="73" y="49" width="25" height="33" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0292" x="126" y="42" width="27" height="15" rotated="true" flipX="false" flipY="false" frameX="-16" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0293" x="112" y="32" width="47" height="27" rotated="false" flipX="false" flipY="false" frameX="-21" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0294" x="28.25" y="17" width="23" height="40" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0295" x="-16" y="100" width="16" height="25" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0296" x="-18" y="72" width="43" height="19" rotated="true" flipX="false" flipY="false" frameX="-30" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0297" x="39" y="35" width="50" height="21" rotated="false" flipX="true" flipY="false" frameX="-20" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0298" x="72" y="-19" width="23" height="17" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0299" x="130" y="96" width="28" height="22" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0300" x="112" y="-18" width="2" height="14" rotated="true" flipX="true" flipY="true" frameX="-19" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0301" x="1.25" y="-14" width="5" height="20" rotated="false" flipX="false" flipY="false" frameX="-18" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0302" x="50" y="47" width="13" height="3" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0303" x="125" y="40" width="34" height="0" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0304" x="90" y="29" width="32" height="31" rotated="true" flipX="false" flipY="false" frameX="-13" frameY="0" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0305" x="74" y="91" width="40" height="5" rotated="false" flipX="false" flipY="true" frameX="-19" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0306" x="93" y="99" width="39" height="0" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0307" x="117" y="99" width="1" height="18" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0308" x="10.25" y="37" width="47" height="3" rotated="true" flipX="false" flipY="false" frameX="-16" frameY="-28" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0309" x="58" y="98" width="18" height="26" rotated="false" flipX="true" flipY="false" frameX="-6" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0310" x="101" y="-3" width="39" height="8" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0311" x="88" y="3" width="29" height="23" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0312" x="43" y="26" width="28" height="11" rotated="true" flipX="true" flipY="false" frameX="-22" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0313" x="40" y="91" width="23" height="31" rotated="false" flipX="false" flipY="false" frameX="-19" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0314" x="120" y="-4" width="30" height="13" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0315" x="96.25" y="46" width="15" height="11" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0316" x="71" y="30" width="24" height="0" rotated="true" flipX="false" flipY="false" frameX="-5" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0317" x="103" y="75" width="50" height="3" rotated="false" flipX="false" flipY="false" frameX="-5" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0318" x="64" y="9" width="41" height="35" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0319" x="94" y="86" width="27" height="13" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0320" x="108" y="46" width="40" height="16" rotated="true" flipX="false" flipY="true" frameX="-6" frameY="-1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0321" x="141" y="6" width="13" height="17" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0322" x="60.25" y="36" width="20" height="8" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0323" x="-8" y="76" width="30" height="11" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0324" x="140" y="52" width="24" height="29" rotated="true" flipX="true" flipY="false" frameX="-15" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0325" x="22" y="4" width="15" height="8" rotated="false" flipX="false" flipY="true" frameX="-17" frameY="3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0326" x="-8" y="54" width="38" height="3" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0327" x="17" y="97" width="16" height="9" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0328" x="-6" y="64" width="8" height="26" rotated="true" flipX="false" flipY="false" frameX="-12" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0329" x="62.25" y="41" width="17" height="24" rotated="false" flipX="false" flipY="false" frameX="-18" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0330" x="96" y="93" width="34" height="36" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0331" x="44" y="62" width="38" height="2" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0332" x="105" y="-7" width="47" height="11" rotated="true" flipX="false" flipY="false" frameX="4" frameY="-15" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0333" x="18" y="26" width="32" height="24" rotated="false" flipX="true" flipY="false" frameX="-4" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0334" x="125" y="10" width="40" height="24" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0335" x="72" y="49" width="23" height="9" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0336" x="37.25" y="89" width="48" height="23" rotated="true" flipX="true" flipY="false" frameX="-12" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0337" x="127" y="67" width="15" height="6" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0338" x="46" y="59" width="35" height="23" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0339" x="84" y="97" width="28" height="39" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0340" x="108" y="0" width="6" height="16" rotated="true" flipX="false" flipY="true" frameX="-2" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0341" x="130" y="2" width="49" height="25" rotated="false" flipX="false" flipY="false" frameX="-27" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0342" x="25" y="4" width="20" height="38" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0343" x="56.25" y="64" width="18" height="4" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0344" x="-14" y="60" width="10" height="18" rotated="true" flipX="false" flipY="false" frameX="-9" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0345" x="77" y="41" width="29" height="11" rotated="false" flipX="true" flipY="true" frameX="3" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0346" x="43" y="36" width="25" height="3" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0347" x="66" y="-18" width="18" height="32" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0348" x="53" y="66" width="5" height="0" rotated="true" flipX="true" flipY="false" frameX="-5" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0349" x="36" y="79" width="8" height="21" rotated="false" flipX="false" flipY="false" frameX="-21" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0350" x="29.25" y="-17" width="25" height="20" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0351" x="150" y="12" width="40" height="6" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0352" x="119" y="84" width="0" height="17" rotated="true" flipX="false" flipY="false" frameX="-25" frameY="-28" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0353" x="11" y="69" width="42" height="21" rotated="false" flipX="false" flipY="false" frameX="1" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0354" x="84" y="59" width="11" height="23" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0355" x="43" y="48" width="46" height="18" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0356" x="90" y="74" width="8" height="19" rotated="true" flipX="false" flipY="false" frameX="-2" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0357" x="96.25" y="76" width="18" height="2" rotated="false" flipX="true" flipY="false" frameX="-12" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0358" x="63" y="-14" width="16" height="28" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0359" x="147" y="42" width="7" height="17" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0360" x="84" y="90" width="10" height="36" rotated="true" flipX="true" flipY="true" frameX="-7" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0361" x="30" y="45" width="18" height="31" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0362" x="131" y="46" width="8" height="1" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0363" x="117" y="58" width="17" height="9" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0364" x="80.25" y="46" width="19" height="37" rotated="true" flipX="false" flipY="false" frameX="-13" frameY="-23" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0365" x="-20" y="75" width="3" height="29" rotated="false" flipX="false" flipY="true" frameX="-24" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0366" x="137" y="30" width="35" height="28" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0367" x="101" y="49" width="28" height="1" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0368" x="31" y="10" width="16" height="11" rotated="true" flipX="false" flipY="false" frameX="-27" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0369" x="86" y="44" width="30" height="19" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0370" x="-2" y="0" width="32" height="8" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0371" x="5.25" y="99" width="14" height="31" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0372" x="4" y="34" width="1" height="35" rotated="true" flipX="true" flipY="false" frameX="-12" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0373" x="60" y="92" width="35" height="15" rotated="false" flipX="false" flipY="false" frameX="-28" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0374" x="67" y="93" width="13" height="20" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0375" x="60" y="47" width="23" height="26" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0376" x="-7" y="22" width="6" height="7" rotated="true" flipX="false" flipY="false" frameX="-29" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0377" x="105" y="59" width="29" height="18" rotated="false" flipX="false" flipY="false" frameX="-30" frameY="-9" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0378" x="106.25" y="99" width="43" height="35" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0379" x="44" y="26" width="19" height="30" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0380" x="47" y="86" width="27" height="28" rotated="true" flipX="false" flipY="true" frameX="-16" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0381" x="92" y="63" width="47" height="29" rotated="false" flipX="true" flipY="false" frameX="-6" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0382" x="27" y="99" width="44" height="0" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0383" x="6" y="6" width="15" height="9" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0384" x="96" y="-1" width="37" height="19" rotated="true" flipX="true" flipY="false" frameX="-1" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0385" x="108.25" y="11" width="46" height="40" rotated="false" flipX="false" flipY="true" frameX="-5" frameY="-1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0386" x="37" y="84" width="19" height="2" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0387" x="85" y="-10" width="35" height="13" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0388" x="58" y="-19" width="14" height="36" rotated="true" flipX="false" flipY="false" frameX="-3" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0389" x="127" y="54" width="19" height="9" rotated="false" flipX="false" flipY="false" frameX="-6" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0390" x="76" y="65" width="24" height="32" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0391" x="132" y="33" width="2" height="26" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0392" x="110.25" y="25" width="20" height="15" rotated="true" flipX="false" flipY="false" frameX="5" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0393" x="-5" y="21" width="29" height="6" rotated="false" flipX="true" flipY="false" frameX="-1" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0394" x="60" y="42" width="31" height="15" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0395" x="-12" y="87" width="2" height="4" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0396" x="113" y="11" width="3" height="38" rotated="true" flipX="true" flipY="false" frameX="-14" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0397" x="-6" y="36" width="3" height="7" rotated="false" flipX="false" flipY="false" frameX="-23" frameY="-27" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0398" x="47" y="-20" width="2" height="27" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0399" x="115.25" y="-8" width="40" height="38" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0400" x="17" y="-20" width="20" height="37" rotated="true" flipX="false" flipY="true" frameX="-19" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0401" x="-3" y="54" width="30" height="35" rotated="false" flipX="false" flipY="false" frameX="5" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0402" x="72" y="39" width="4" height="0" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0403" x="148" y="11" width="25" height="31" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0404" x="24" y="84" width="12" height="25" rotated="true" flipX="false" flipY="false" frameX="-8" frameY="-30" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0405" x="7" y="-3" width="22" height="28" rotated="false" flipX="true" flipY="true" frameX="2" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0406" x="74.25" y="-6" width="45" height="27" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0407" x="87" y="91" width="3" height="21" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0408" x="67" y="48" width="44" height="1" rotated="true" flipX="true" flipY="false" frameX="-29" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0409" x="64" y="9" width="1" height="36" rotated="false" flipX="false" flipY="false" frameX="-13" frameY="-4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0410" x="13" y="43" width="28" height="19" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0411" x="28" y="-2" width="24" height="5" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0412" x="36" y="-13" width="47" height="12" rotated="true" flipX="false" flipY="false" frameX="-21" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0413" x="100.25" y="11" width="11" height="5" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0414" x="103" y="98" width="13" height="33" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0415" x="44" y="29" width="1" height="3" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0416" x="44" y="12" width="35" height="3" rotated="true" flipX="false" flipY="false" frameX="-8" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0417" x="-18" y="27" width="45" height="34" rotated="false" flipX="true" flipY="false" frameX="4" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0418" x="149" y="88" width="7" height="38" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0419" x="-2" y="32" width="45" height="32" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0420" x="77.25" y="85" width="32" height="30" rotated="true" flipX="true" flipY="true" frameX="-6" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0421" x="-7" y="40" width="45" height="22" rotated="false" flipX="false" flipY="false" frameX="0" frameY="-17" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0422" x="-12" y="86" width="26" height="35" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0423" x="26" y="-10" width="38" height="21" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0424" x="18" y="-17" width="27" height="8" rotated="true" flipX="false" flipY="false" frameX="-5" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0425" x="84" y="-5" width="47" height="16" rotated="false" flipX="false" flipY="true" frameX="0" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0426" x="70" y="19" width="36" height="8" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0427" x="43.25" y="18" width="0" height="40" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0428" x="14" y="-13" width="20" height="34" rotated="true" flipX="false" flipY="false" frameX="-23" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0429" x="133" y="0" width="16" height="17" rotated="false" flipX="true" flipY="false" frameX="-30" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0430" x="88" y="36" width="35" height="16" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0431" x="145" y="96" width="12" height="15" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0432" x="100" y="71" width="46" height="10" rotated="true" flipX="true" flipY="false" frameX="-9" frameY="0" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0433" x="-5" y="71" width="1" height="17" rotated="false" flipX="false" flipY="false" frameX="-13" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0434" x="91.25" y="21" width="5" height="10" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0435" x="20" y="74" width="49" height="0" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0436" x="23" y="62" width="20" height="30" rotated="true" flipX="false" flipY="false" frameX="-27" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0437" x="38" y="-7" width="11" height="4" rotated="false" flipX="false" flipY="false" frameX="-26" frameY="1" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0438" x="3" y="93" width="25" height="5" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0439" x="124" y="12" width="42" height="6" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0440" x="29" y="13" width="21" height="4" rotated="true" flipX="false" flipY="true" frameX="-3" frameY="-17" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0441" x="120.25" y="84" width="17" height="22" rotated="false" flipX="true" flipY="false" frameX="-12" frameY="-5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0442" x="44" y="79" width="42" height="25" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0443" x="112" y="5" width="22" height="31" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0444" x="128" y="65" width="1" height="11" rotated="true" flipX="true" flipY="false" frameX="-17" frameY="2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0445" x="98" y="29" width="50" height="27" rotated="false" flipX="false" flipY="true" frameX="-12" frameY="-7" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0446" x="98" y="30" width="14" height="10" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0447" x="86" y="22" width="7" height="9" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0448" x="94.25" y="89" width="13" height="4" rotated="true" flipX="false" flipY="false" frameX="-21" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0449" x="91" y="83" width="25" height="28" rotated="false" flipX="false" flipY="false" frameX="-29" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0450" x="112" y="34" width="22" height="8" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0451" x="56" y="-11" width="40" height="38" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0452" x="-13" y="25" width="29" height="39" rotated="true" flipX="false" flipY="false" frameX="-22" frameY="-3" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0453" x="1" y="61" width="14" height="14" rotated="false" flipX="true" flipY="false" frameX="-24" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0454" x="67" y="76" width="9" height="39" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0455" x="98.25" y="-14" width="1" height="32" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0456" x="93" y="-7" width="34" height="10" rotated="true" flipX="true" flipY="false" frameX="-16" frameY="-9" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0457" x="43" y="63" width="36" height="37" rotated="false" flipX="false" flipY="false" frameX="-29" frameY="-8" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0458" x="27" y="26" width="25" height="21" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0459" x="57" y="77" width="44" height="13" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0460" x="16" y="39" width="35" height="38" rotated="true" flipX="false" flipY="true" frameX="2" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0461" x="1" y="96" width="12" height="9" rotated="false" flipX="false" flipY="false" frameX="-4" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0462" x="97.25" y="42" width="19" height="26" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0463" x="-20" y="9" width="40" height="19" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0464" x="33" y="54" width="15" height="29" rotated="true" flipX="false" flipY="false" frameX="5" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0465" x="72" y="64" width="38" height="38" rotated="false" flipX="true" flipY="true" frameX="-8" frameY="-29" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0466" x="28" y="-15" width="43" height="20" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0467" x="46" y="-5" width="1" height="3" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0468" x="14" y="39" width="38" height="17" rotated="true" flipX="true" flipY="false" frameX="-9" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0469" x="70.25" y="56" width="27" height="34" rotated="false" flipX="false" flipY="false" frameX="-11" frameY="-9" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0470" x="138" y="-5" width="6" height="37" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0471" x="128" y="3" width="16" height="13" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0472" x="32" y="7" width="44" height="28" rotated="true" flipX="false" flipY="false" frameX="-2" frameY="-25" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0473" x="95" y="40" width="34" height="9" rotated="false" flipX="false" flipY="false" frameX="-6" frameY="4" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0474" x="139" y="81" width="20" height="5" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0475" x="96" y="55" width="5" height="24" rotated="false" flipX="false" flipY="true"/>
+<SubTexture name="case0476" x="101.25" y="32" width="0" height="24" rotated="true" flipX="false" flipY="false" frameX="-29" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0477" x="75" y="-10" width="26" height="26" rotated="false" flipX="true" flipY="false" frameX="-17" frameY="-18" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0478" x="-9" y="17" width="36" height="5" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0479" x="-20" y="71" width="6" height="13" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0480" x="149" y="63" width="24" height="36" rotated="true" flipX="true" flipY="true" frameX="2" frameY="-2" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0481" x="86" y="17" width="5" height="14" rotated="false" flipX="false" flipY="false" frameX="3" frameY="-20" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0482" x="96" y="79" width="5" height="25" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0483" x="149.25" y="63" width="12" height="12" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0484" x="50" y="0" width="43" height="15" rotated="true" flipX="false" flipY="false" frameX="-6" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0485" x="29" y="62" width="34" height="7" rotated="false" flipX="false" flipY="true" frameX="-19" frameY="-14" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0486" x="142" y="-4" width="30" height="27" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0487" x="-11" y="29" width="26" height="37" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0488" x="66" y="93" width="43" height="5" rotated="true" flipX="false" flipY="false" frameX="-26" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0489" x="33" y="16" width="25" height="26" rotated="false" flipX="true" flipY="false" frameX="0" frameY="-22" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0490" x="-11.75" y="-10" width="33" height="18" rotated="true" flipX="false" flipY="true"/>
+<SubTexture name="case0491" x="125" y="75" width="31" height="23" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0492" x="80" y="87" width="5" height="6" rotated="true" flipX="true" flipY="false" frameX="-15" frameY="-19" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0493" x="106" y="100" width="47" height="14" rotated="false" flipX="false" flipY="false" frameX="-3" frameY="-21" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0494" x="142" y="-15" width="49" height="4" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0495" x="66" y="-11" width="23" height="12" rotated="false" flipX="true" flipY="true"/>
+<SubTexture name="case0496" x="64" y="2" width="3" height="27" rotated="true" flipX="false" flipY="false" frameX="-27" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0497" x="65.25" y="46" width="2" height="30" rotated="false" flipX="false" flipY="false" frameX="-25" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0498" x="100" y="57" width="44" height="15" rotated="true" flipX="true" flipY="false"/>
+<SubTexture name="case0499" x="13" y="78" width="21" height="22" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0500" x="106" y="38" width="20" height="2" rotated="true" flipX="false" flipY="true" frameX="-5" frameY="-11" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0501" x="96" y="65" width="11" height="0" rotated="false" flipX="true" flipY="false" frameX="3" frameY="-6" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0502" x="54" y="2" width="4" height="39" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0503" x="120" y="52" width="36" height="6" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0504" x="148.25" y="90" width="8" height="21" rotated="true" flipX="true" flipY="false" frameX="-20" frameY="5" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0505" x="50" y="68" width="9" height="20" rotated="false" flipX="false" flipY="true" frameX="-29" frameY="-12" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0506" x="25" y="46" width="24" height="12" rotated="true" flipX="false" flipY="false"/>
+<SubTexture name="case0507" x="115" y="58" width="40" height="23" rotated="false" flipX="true" flipY="false"/>
+<SubTexture name="case0508" x="111" y="93" width="21" height="26" rotated="true" flipX="false" flipY="false" frameX="-27" frameY="-16" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0509" x="118" y="34" width="2" height="39" rotated="false" flipX="false" flipY="false" frameX="-14" frameY="-26" frameWidth="80" frameHeight="70"/>
+<SubTexture name="case0510" x="112" y="96" width="15" height="27" rotated="true" flipX="true" flipY="true"/>
+<SubTexture name="case0511" x="138.25" y="-9" width="39" height="6" rotated="false" flipX="false" flipY="false"/>
+<SubTexture name="case0000" x="1" y="1" width="2" height="3"/>
+<SubTexture name="empty" x="3" y="4" width="0" height="4"/>
+<SubTexture name="empty" x="1" y="2" width="3" height="4"/>
+<SubTexture name="escaped &amp; &#x41;" x="1.5" y="2.25" width="3.5" height="4.75"/>
+</TextureAtlas>

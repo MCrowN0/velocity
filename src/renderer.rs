@@ -34,22 +34,6 @@ struct SpriteInstance {
     uv: [f32; 4],
     color: Color,
 }
-impl SpriteInstance {
-    fn sprite(sprite: &Sprite) -> Self {
-        let signed = sprite.signed_size();
-        Self {
-            position: sprite.position,
-            size: signed.abs(),
-            color: sprite.color,
-            uv: [
-                if signed.x < 0. { 1. } else { 0. },
-                if signed.y < 0. { 1. } else { 0. },
-                if signed.x < 0. { -1. } else { 1. },
-                if signed.y < 0. { -1. } else { 1. },
-            ],
-        }
-    }
-}
 const _: () = assert!(std::mem::size_of::<SpriteInstance>() == 48);
 
 #[derive(Clone, Copy)]
@@ -58,6 +42,7 @@ struct Batch {
     first: u32,
     count: u32,
     premultiplied: bool,
+    clip: Option<vk::Rect2D>,
 }
 #[derive(Default)]
 struct DrawList {
@@ -76,11 +61,21 @@ impl DrawList {
         descriptor: vk::DescriptorSet,
         premultiplied: bool,
     ) {
+        self.push_clipped(instance, descriptor, premultiplied, None);
+    }
+    fn push_clipped(
+        &mut self,
+        instance: SpriteInstance,
+        descriptor: vk::DescriptorSet,
+        premultiplied: bool,
+        clip: Option<vk::Rect2D>,
+    ) {
         let first = self.instances.len() as u32;
         self.instances.push(instance);
         if let Some(last) = self.batches.last_mut()
             && last.descriptor == descriptor
             && last.premultiplied == premultiplied
+            && last.clip == clip
         {
             last.count += 1;
             return;
@@ -90,6 +85,7 @@ impl DrawList {
             first,
             count: 1,
             premultiplied,
+            clip,
         });
     }
     fn bytes(&self) -> &[u8] {
@@ -326,7 +322,6 @@ impl Drop for Swapchain {
 }
 
 pub struct Renderer {
-    pub sprites: Vec<Sprite>,
     /// The 1280×720 logical surface used by sprites with no explicit surface.
     pub default_surface: Surface,
     pub clear_color: Color,
@@ -358,10 +353,10 @@ impl Renderer {
         device.pipeline(IMAGE_FORMAT)?;
         let id = NEXT_RENDERER.fetch_add(1, Ordering::Relaxed);
         let mut renderer = Self {
-            sprites: Vec::new(),
             default_surface: Surface {
                 renderer: id,
                 index: 0,
+                logical_size: [1280, 720],
             },
             clear_color: Color::BLACK,
             uploader: assets::Uploader::new(device.clone()),
@@ -395,9 +390,6 @@ impl Renderer {
     pub fn cached_texture_count(&self) -> usize {
         self.textures.len() + self.uploader.textures.borrow().len()
     }
-    pub fn add_sprite(&mut self, sprite: Sprite) {
-        self.sprites.push(sprite);
-    }
     pub fn create_surface(&mut self, width: u16, height: u16, position: Vec2) -> Result<Surface> {
         if width == 0 || height == 0 || !position.is_finite() {
             return Err("surface dimensions must be nonzero and offset finite".into());
@@ -406,6 +398,7 @@ impl Renderer {
         let handle = Surface {
             renderer: self.id,
             index: self.surfaces.len(),
+            logical_size: [width, height],
         };
         self.surfaces.push(SurfaceTarget {
             image,
@@ -431,28 +424,25 @@ impl Renderer {
         self.surfaces[surface.index].position = position;
         Ok(())
     }
-    pub fn read_surface(&self, surface: Surface) -> Result<Vec<u8>> {
+    fn surface_target(&self, surface: Surface) -> Result<&SurfaceTarget> {
         if surface.renderer != self.id {
             return Err("surface belongs to another renderer".into());
         }
-        let surface = &self.surfaces[surface.index];
+        Ok(&self.surfaces[surface.index])
+    }
+    pub fn read_surface(&self, surface: Surface) -> Result<Vec<u8>> {
+        let surface = self.surface_target(surface)?;
         if !surface.initialized {
             return Err("surface has not been rendered yet".into());
         }
         surface.image.read()
     }
     pub fn surface_size(&self, surface: Surface) -> Result<[u32; 2]> {
-        if surface.renderer != self.id {
-            return Err("surface belongs to another renderer".into());
-        }
-        let image = &self.surfaces[surface.index].image;
+        let image = &self.surface_target(surface)?.image;
         Ok([image.width, image.height])
     }
     pub fn surface_position(&self, surface: Surface, point: Vec2) -> Result<Vec2> {
-        if surface.renderer != self.id {
-            return Err("surface belongs to another renderer".into());
-        }
-        let target = &self.surfaces[surface.index];
+        let target = self.surface_target(surface)?;
         let [w, h] = self.window.size();
         if w == 0 || h == 0 {
             return Err("window is minimized".into());
@@ -479,7 +469,6 @@ impl Renderer {
         ))
     }
     pub(crate) fn clear_scene(&mut self) -> Result<()> {
-        self.sprites.clear();
         self.collect_unused()?;
         self.surfaces.clear();
         self.id = NEXT_RENDERER.fetch_add(1, Ordering::Relaxed);
@@ -500,14 +489,14 @@ impl Renderer {
         }
         Ok(())
     }
-    pub fn render(&mut self) -> Result<RenderStats> {
-        self.render_internal(false).map(|(stats, _)| stats)
+    pub fn render(&mut self, scene: &mut Scene) -> Result<RenderStats> {
+        self.render_internal(scene, false).map(|(stats, _)| stats)
     }
-    pub fn render_capture(&mut self) -> Result<(RenderStats, Vec<u8>)> {
-        self.render_internal(true)
+    pub fn render_capture(&mut self, scene: &mut Scene) -> Result<(RenderStats, Vec<u8>)> {
+        self.render_internal(scene, true)
     }
 
-    fn prepare(&mut self, size: Vec2) -> Result<RenderStats> {
+    fn prepare(&mut self, scene: &mut Scene, size: Vec2) -> Result<RenderStats> {
         let mut stats = RenderStats::default();
         self.window_list.clear();
         for surface in &mut self.surfaces {
@@ -544,22 +533,44 @@ impl Renderer {
         self.frames[self.frame]
             .garbage
             .append(&mut self.uploader.garbage.borrow_mut());
+        scene.sync();
         let asset_textures = self.uploader.textures.borrow();
         // Only valid during this preparation: public sprite/texture fields may change
         // between frames. Reuse descriptors across adjacent visible texture runs.
         let mut last_texture = None;
+        let mut first_surface: Option<usize> = None;
+        let mut mixed_surfaces = false;
         let default_bounds = self
             .surfaces
             .get(self.default_surface.index)
             .map(|s| s.clip_max);
-        for chunk in self.sprites.chunks(4) {
-            // SSE2 is baseline on Windows x64. Four independent positions at once,
-            // without following texture pointers or building temporary bounds arrays.
-            if default_bounds.is_some_and(|bounds| reject_default_chunk(chunk, bounds)) {
-                stats.culled += chunk.len();
-                continue;
+        for chunk in scene.order.chunks(4) {
+            if let [
+                crate::scene::DrawHandle::Sprite(a),
+                crate::scene::DrawHandle::Sprite(b),
+                crate::scene::DrawHandle::Sprite(c),
+                crate::scene::DrawHandle::Sprite(d),
+            ] = chunk
+            {
+                let sprites = [
+                    scene.get(*a).unwrap(),
+                    scene.get(*b).unwrap(),
+                    scene.get(*c).unwrap(),
+                    scene.get(*d).unwrap(),
+                ];
+                if default_bounds.is_some_and(|bounds| reject_default_chunk(&sprites, bounds)) {
+                    stats.culled += 4;
+                    continue;
+                }
             }
-            for sprite in chunk {
+            for handle in chunk {
+                let (sprite, animated): (&Sprite, Option<&AnimatedSprite>) = match *handle {
+                    crate::scene::DrawHandle::Sprite(handle) => (scene.get(handle).unwrap(), None),
+                    crate::scene::DrawHandle::Animated(handle) => {
+                        let sprite = scene.get(handle).unwrap();
+                        (sprite, Some(sprite))
+                    }
+                };
                 if !sprite.visible || sprite.color.a <= 0. {
                     stats.culled += 1;
                     continue;
@@ -575,19 +586,39 @@ impl Renderer {
                     continue;
                 }
                 let bounds = target.clip_max;
-                let Some(sprite_size) = drawable_size(sprite, bounds) else {
+                if animated.is_some_and(|s| s.frames.contained)
+                    && (sprite.position.x >= bounds.x || sprite.position.y >= bounds.y)
+                {
                     stats.culled += 1;
                     continue;
+                }
+                let atlas_frame = animated.map(|s| s.atlas_frame());
+                let (draw_position, sprite_size, uv) = if let Some(frame) = atlas_frame {
+                    let (position, size, uv) = sprite.geometry(Some(frame));
+                    let c = sprite.color;
+                    if !intersects(position, size, bounds)
+                        || ![c.r, c.g, c.b, c.a].iter().all(|v| v.is_finite())
+                    {
+                        stats.culled += 1;
+                        continue;
+                    }
+                    (position, size, uv)
+                } else {
+                    let Some(size) = drawable_size(sprite, bounds) else {
+                        stats.culled += 1;
+                        continue;
+                    };
+                    (sprite.position, size, sprite.geometry(None).2)
                 };
                 {
-                    if sprite.position.x + sprite_size.x <= target.clip_min.x
-                        || sprite.position.y + sprite_size.y <= target.clip_min.y
+                    if draw_position.x + sprite_size.x <= target.clip_min.x
+                        || draw_position.y + sprite_size.y <= target.clip_min.y
                     {
                         stats.culled += 1;
                         continue;
                     }
                 }
-                let position = sprite.position * target.scale;
+                let position = draw_position * target.scale;
                 let scaled_size = sprite_size * target.scale;
                 if !position.is_finite() || !scaled_size.is_finite() {
                     stats.culled += 1;
@@ -605,11 +636,11 @@ impl Renderer {
                     asset_textures
                         .get(&gpu.key)
                         .ok_or("GPU texture is no longer available")?
-                        .descriptor
+                        .filtered_descriptor(sprite.texture.filter)
                 } else {
                     match self.textures.entry(key) {
                         std::collections::hash_map::Entry::Occupied(entry) => {
-                            entry.get().image.descriptor
+                            entry.get().image.filtered_descriptor(sprite.texture.filter)
                         }
                         std::collections::hash_map::Entry::Vacant(entry) => {
                             let image = Image::new(
@@ -618,8 +649,10 @@ impl Renderer {
                                 sprite.texture.height() as u32,
                                 false,
                             )?;
-                            image.upload(sprite.texture.pixels())?;
-                            let descriptor = image.descriptor;
+                            let mut pixels = sprite.texture.pixels().to_vec();
+                            crate::assets::premultiply(&mut pixels);
+                            image.upload(&pixels)?;
+                            let descriptor = image.filtered_descriptor(sprite.texture.filter);
                             entry.insert(CachedTexture {
                                 source: Arc::downgrade(&sprite.texture),
                                 image,
@@ -631,16 +664,53 @@ impl Renderer {
                     }
                 };
                 last_texture = Some((key, descriptor));
-                let mut instance = SpriteInstance::sprite(sprite);
-                instance.position = position;
-                instance.size = scaled_size;
-                let list = &mut self.surfaces[handle.index].list;
-                list.push(instance, descriptor, false);
+                let mut instance = SpriteInstance {
+                    position,
+                    size: scaled_size,
+                    uv,
+                    color: sprite.color,
+                };
+                if atlas_frame.is_some_and(|f| f.rotated) {
+                    instance.size.x = -instance.size.x;
+                }
+                if let Some(first) = first_surface {
+                    if first != handle.index && !mixed_surfaces {
+                        mixed_surfaces = true;
+                        let target = &self.surfaces[first];
+                        for batch in &target.list.batches {
+                            for &instance in &target.list.instances
+                                [batch.first as usize..(batch.first + batch.count) as usize]
+                            {
+                                push_window(
+                                    &mut self.window_list,
+                                    target,
+                                    instance,
+                                    batch.descriptor,
+                                    size,
+                                );
+                            }
+                        }
+                    }
+                } else {
+                    first_surface = Some(handle.index);
+                }
+                if mixed_surfaces {
+                    push_window(
+                        &mut self.window_list,
+                        &self.surfaces[handle.index],
+                        instance,
+                        descriptor,
+                        size,
+                    );
+                }
+                self.surfaces[handle.index]
+                    .list
+                    .push(instance, descriptor, false);
                 stats.drawn += 1;
             }
         }
         for surface in &self.surfaces {
-            if surface.visible && !surface.list.instances.is_empty() {
+            if !mixed_surfaces && surface.visible && !surface.list.instances.is_empty() {
                 self.window_list.push(
                     SpriteInstance {
                         position: surface.origin,
@@ -666,17 +736,21 @@ impl Renderer {
         Ok(stats)
     }
 
-    fn render_internal(&mut self, capture: bool) -> Result<(RenderStats, Vec<u8>)> {
+    fn render_internal(
+        &mut self,
+        scene: &mut Scene,
+        capture: bool,
+    ) -> Result<(RenderStats, Vec<u8>)> {
         if self.failed {
             return Err("renderer stopped after a Vulkan error; recreate it".into());
         }
-        let result = self.render_frame(capture);
+        let result = self.render_frame(scene, capture);
         if result.is_err() {
             self.failed = true;
         }
         result
     }
-    fn render_frame(&mut self, capture: bool) -> Result<(RenderStats, Vec<u8>)> {
+    fn render_frame(&mut self, scene: &mut Scene, capture: bool) -> Result<(RenderStats, Vec<u8>)> {
         unsafe {
             let size = self.window.size();
             if size[0] == 0 || size[1] == 0 {
@@ -701,10 +775,10 @@ impl Renderer {
             frame.garbage.clear();
             let extent = self.swap.as_ref().unwrap().extent;
             let canvas = canvas_rect(self.canvas_size, extent);
-            let stats = self.prepare(vec2(
-                canvas.extent.width as f32,
-                canvas.extent.height as f32,
-            ))?;
+            let stats = self.prepare(
+                scene,
+                vec2(canvas.extent.width as f32, canvas.extent.height as f32),
+            )?;
             let frame = &mut self.frames[self.frame];
             let required = self.instance_bytes.max(48);
             if frame
@@ -926,7 +1000,7 @@ impl Renderer {
 }
 
 #[inline]
-fn reject_default_chunk(sprites: &[Sprite], bounds: Vec2) -> bool {
+fn reject_default_chunk(sprites: &[&Sprite], bounds: Vec2) -> bool {
     if sprites.len() != 4 {
         return false;
     }
@@ -964,6 +1038,33 @@ impl Drop for Renderer {
             let _ = self.device.raw.device_wait_idle();
         }
     }
+}
+
+fn push_window(
+    list: &mut DrawList,
+    target: &SurfaceTarget,
+    mut instance: SpriteInstance,
+    descriptor: vk::DescriptorSet,
+    size: Vec2,
+) {
+    instance.position.x += target.origin.x;
+    instance.position.y += target.origin.y;
+    let left = target.origin.x.round().clamp(0., size.x) as i32;
+    let top = target.origin.y.round().clamp(0., size.y) as i32;
+    let right = (target.origin.x + target.image.width as f32)
+        .round()
+        .clamp(0., size.x) as i32;
+    let bottom = (target.origin.y + target.image.height as f32)
+        .round()
+        .clamp(0., size.y) as i32;
+    let clip = vk::Rect2D {
+        offset: vk::Offset2D { x: left, y: top },
+        extent: vk::Extent2D {
+            width: (right - left) as u32,
+            height: (bottom - top) as u32,
+        },
+    };
+    list.push_clipped(instance, descriptor, false, Some(clip));
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1045,6 +1146,15 @@ unsafe fn draw_pass(
                 .raw
                 .cmd_bind_vertex_buffers(cmd, 0, &[vertex], &[list.offset]);
             for batch in &list.batches {
+                let clip = batch
+                    .clip
+                    .map(|mut clip| {
+                        clip.offset.x += area.offset.x;
+                        clip.offset.y += area.offset.y;
+                        clip
+                    })
+                    .unwrap_or(area);
+                device.raw.cmd_set_scissor(cmd, 0, &[clip]);
                 let push = [
                     (area.extent.width as f32).to_bits(),
                     (area.extent.height as f32).to_bits(),
@@ -1121,10 +1231,94 @@ mod lifetime_tests {
 
     #[test]
     #[ignore = "requires a Vulkan GPU"]
+    fn linear_filtering_preserves_transparent_edge_colors() {
+        let window = Window::with_visibility("Alpha filtering test", 64, 64, false).unwrap();
+        let mut renderer = Renderer::with_vsync(&window, false).unwrap();
+        renderer.clear_color = Color::new(1., 1., 0., 1.);
+        let surface = renderer.create_surface(64, 64, vec2(0., 0.)).unwrap();
+        for transparent in [[0, 0, 0, 0], [255, 0, 255, 0]] {
+            let source = [vec![255; 4], transparent.to_vec()].concat();
+            let texture = Arc::new(Texture::from_rgba(2, 1, source.clone()).unwrap());
+            let mut sprite = Sprite::new(texture.clone());
+            sprite.surface = Some(surface);
+            sprite.size = Some(vec2(8., 8.));
+            let mut scene = Scene::new();
+            let handle = scene.add(sprite);
+            for opacity in [1., 0.5] {
+                scene[handle].color.a = opacity;
+                let (_, frame) = renderer.render_capture(&mut scene).unwrap();
+                let pixels = renderer.read_surface(surface).unwrap();
+                let expected = (255. * 0.625 * opacity).round() as u8;
+                for actual in &pixels[(3 * 64 + 3) * 4..][..4] {
+                    assert!(actual.abs_diff(expected) <= 2, "{actual} != {expected}");
+                }
+                for (actual, expected) in frame[(3 * 64 + 3) * 4..][..4]
+                    .iter()
+                    .zip([255, 255, expected, 255])
+                {
+                    assert!(
+                        actual.abs_diff(expected) <= 2,
+                        "composited {actual} != {expected}"
+                    );
+                }
+            }
+            assert_eq!(texture.pixels(), source);
+        }
+    }
+
+    #[test]
+    #[ignore = "requires a Vulkan GPU"]
+    fn texture_filtering_matches_bilinear_and_nearest_samples() {
+        let window = Window::with_visibility("Filtering test", 64, 64, false).unwrap();
+        let mut renderer = Renderer::with_vsync(&window, false).unwrap();
+        let surface = renderer.create_surface(64, 64, vec2(0., 0.)).unwrap();
+        for filter in [crate::TextureFilter::Linear, crate::TextureFilter::Nearest] {
+            let mut texture = Texture::from_rgba(
+                2,
+                2,
+                vec![
+                    255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 255, 255,
+                ],
+            )
+            .unwrap();
+            assert_eq!(texture.filter, crate::TextureFilter::Linear);
+            texture.filter = filter;
+            let mut sprite = Sprite::new(Arc::new(texture));
+            sprite.surface = Some(surface);
+            sprite.size = Some(vec2(8., 8.));
+            let mut scene = Scene::new();
+            let handle = scene.add(sprite);
+            renderer.render(&mut scene).unwrap();
+            let pixels = renderer.read_surface(surface).unwrap();
+            let expected: [u8; 4] = match filter {
+                crate::TextureFilter::Linear => [135, 96, 96, 255],
+                crate::TextureFilter::Nearest => [255, 0, 0, 255],
+            };
+            for (actual, expected) in pixels[(3 * 64 + 3) * 4..][..4].iter().zip(expected) {
+                assert!(
+                    actual.abs_diff(expected) <= 2,
+                    "{filter:?}: {actual} != {expected}"
+                );
+            }
+            assert_eq!(&pixels[..4], &[255, 0, 0, 255]);
+            if filter == crate::TextureFilter::Linear {
+                scene[handle].size = Some(vec2(1., 1.));
+                renderer.render(&mut scene).unwrap();
+                let pixels = renderer.read_surface(surface).unwrap();
+                for (actual, expected) in pixels[..4].iter().zip([128u8, 128, 128, 255]) {
+                    assert!(actual.abs_diff(expected) <= 2);
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires a Vulkan GPU"]
     fn gpu_resources_are_released_after_texture_churn_and_renderer_drop() {
         for _ in 0..4 {
             let window = Window::with_visibility("Lifetime test", 64, 64, false).unwrap();
             let mut renderer = Renderer::with_vsync(&window, false).unwrap();
+            let mut scene = Scene::new();
             let device = Rc::downgrade(&renderer.device);
             let uploader = Rc::downgrade(&renderer.uploader);
             let instance = Rc::downgrade(&renderer.device.instance);
@@ -1133,11 +1327,11 @@ mod lifetime_tests {
                 for _ in 0..64 {
                     let texture = Arc::new(Texture::from_rgba(1, 1, vec![255; 4]).unwrap());
                     handles.push(Arc::downgrade(&texture));
-                    renderer.sprites.push(Sprite::new(texture));
+                    scene.add(Sprite::new(texture));
                 }
-                renderer.render().unwrap();
+                renderer.render(&mut scene).unwrap();
                 assert_eq!(renderer.cached_texture_count(), 64);
-                renderer.sprites.clear();
+                scene.clear();
                 renderer.collect_unused().unwrap();
                 assert_eq!(renderer.cached_texture_count(), 0);
                 assert!(handles.iter().all(|handle| handle.upgrade().is_none()));

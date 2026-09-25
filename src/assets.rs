@@ -1,5 +1,5 @@
 use crate::{
-    Texture,
+    Texture, TextureFilter,
     vulkan::{Device, Image},
 };
 use ash::vk;
@@ -46,6 +46,7 @@ impl TextureCompression {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct TextureLoadOptions {
     pub compression: TextureCompression,
+    pub filter: TextureFilter,
 }
 
 mod sealed {
@@ -102,6 +103,7 @@ impl Asset for Texture {
             width,
             height,
             pixels: Box::default(),
+            filter: options.filter,
             gpu: Some(GpuHandle {
                 owner: id,
                 key,
@@ -110,6 +112,28 @@ impl Asset for Texture {
         });
         uploader.textures.borrow_mut().insert(key, image);
         Ok(texture)
+    }
+}
+
+impl sealed::Sealed for crate::SpriteFrames {}
+impl Asset for crate::SpriteFrames {
+    fn load_asset(
+        assets: &Assets,
+        path: &Path,
+        options: TextureLoadOptions,
+    ) -> Result<Arc<Self>, String> {
+        let xml = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+        let (image_path, entries) = crate::animation::parse_sparrow(&xml)?;
+        let image_path = normalize(&image_path)?;
+        let image = path.parent().ok_or("atlas has no parent")?.join(image_path);
+        let index = assets.inner.index.as_ref().map_err(Clone::clone)?;
+        let key = index
+            .iter()
+            .find(|(_, p)| **p == image)
+            .map(|(key, _)| key)
+            .ok_or("atlas image is not indexed")?;
+        let texture = assets.load_with::<Texture>(key, options)?;
+        Ok(Arc::new(Self::from_entries(texture, entries)?))
     }
 }
 
@@ -365,11 +389,22 @@ pub(crate) fn decode(bytes: &[u8]) -> Result<image::DynamicImage, String> {
     })
 }
 
+pub(crate) fn premultiply(pixels: &mut [u8]) {
+    for pixel in pixels.chunks_exact_mut(4) {
+        let alpha = u16::from(pixel[3]);
+        for channel in &mut pixel[..3] {
+            *channel = ((u16::from(*channel) * alpha + 127) / 255) as u8;
+        }
+    }
+}
+
 fn encode(image: image::DynamicImage, compression: TextureCompression) -> Vec<u8> {
     use TextureCompression::*;
     use intel_tex_2::*;
     if compression == RGBA8 {
-        return image.into_rgba8().into_raw();
+        let mut pixels = image.into_rgba8().into_raw();
+        premultiply(&mut pixels);
+        return pixels;
     }
     let width = image.width().next_multiple_of(4);
     let height = image.height().next_multiple_of(4);
@@ -396,7 +431,15 @@ fn encode(image: image::DynamicImage, compression: TextureCompression) -> Vec<u8
             },
         );
     }
-    let image = image.into_rgba8();
+    let mut image = image.into_rgba8();
+    if matches!(compression, BC2 | BC3 | BC7) {
+        if compression == BC2 {
+            for pixel in image.pixels_mut() {
+                pixel[3] = ((u16::from(pixel[3]) + 8) / 17 * 17) as u8;
+            }
+        }
+        premultiply(image.as_mut());
+    }
     let image = if image.width() == width && image.height() == height {
         image
     } else {
@@ -486,10 +529,33 @@ mod tests {
                 "nested/test.png",
                 TextureLoadOptions {
                     compression: TextureCompression::RGBA8,
+                    ..Default::default()
                 },
             )
             .unwrap();
         assert!(!Arc::ptr_eq(&cached, &other));
+        let nearest = assets
+            .preload_with::<TestAsset>(
+                "nested/test.png",
+                TextureLoadOptions {
+                    filter: TextureFilter::Nearest,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        assert!(!Arc::ptr_eq(&cached, &nearest));
+        assert!(Arc::ptr_eq(
+            &nearest,
+            &assets
+                .load_with::<TestAsset>(
+                    "nested/test.png",
+                    TextureLoadOptions {
+                        filter: TextureFilter::Nearest,
+                        ..Default::default()
+                    },
+                )
+                .unwrap()
+        ));
         assets.deload("nested\\test.png");
         assert_eq!(Arc::strong_count(&cached), 1);
         assert_eq!(Arc::strong_count(&other), 1);

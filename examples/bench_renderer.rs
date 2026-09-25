@@ -1,4 +1,5 @@
 use std::{sync::Arc, time::Instant};
+use velocity::Scene;
 use velocity::{Renderer, Sprite, Texture, Window, vec2};
 fn main() -> Result<(), String> {
     let count: usize = std::env::args()
@@ -7,6 +8,7 @@ fn main() -> Result<(), String> {
         .unwrap_or(10_000);
     let window = Window::new("Velocity throughput benchmark", 960, 640)?;
     let mut renderer = Renderer::with_vsync(&window, false)?;
+    let mut scene = Scene::new();
     let texture = Arc::new(Texture::from_rgba(1, 1, vec![255; 4])?);
     for index in 0..count * 4 {
         let mut sprite = Sprite::new(texture.clone());
@@ -21,7 +23,7 @@ fn main() -> Result<(), String> {
             3 => sprite.position.x = 2000.,
             _ => {}
         }
-        renderer.sprites.push(sprite);
+        scene.add(sprite);
     }
     let mut samples = Vec::with_capacity(600);
     for frame in 0..720 {
@@ -29,7 +31,7 @@ fn main() -> Result<(), String> {
             return Err("benchmark window closed".into());
         }
         let start = Instant::now();
-        let stats = renderer.render()?;
+        let stats = renderer.render(&mut scene)?;
         let elapsed = start.elapsed();
         assert_eq!(
             (stats.drawn, stats.culled, stats.draw_calls),

@@ -1,5 +1,7 @@
 pub mod assets;
 pub mod audio;
+mod key;
+pub use key::Key;
 #[allow(dead_code, unused_imports, clippy::all)]
 #[path = "../vendor/avif/mod.rs"]
 mod avif;
@@ -54,7 +56,14 @@ impl Color {
     pub const BLACK: Self = Self::new(0., 0., 0., 1.);
     pub const TRANSPARENT: Self = Self::new(0., 0., 0., 0.);
 }
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum TextureFilter {
+    #[default]
+    Linear,
+    Nearest,
+}
 pub struct Texture {
+    pub filter: TextureFilter,
     width: u16,
     height: u16,
     pixels: Box<[u8]>,
@@ -79,6 +88,7 @@ impl Texture {
             width,
             height,
             pixels: pixels.into_boxed_slice(),
+            filter: TextureFilter::default(),
             gpu: None,
         })
     }
@@ -110,11 +120,11 @@ impl Texture {
 pub struct Surface {
     pub(crate) renderer: u64,
     pub(crate) index: usize,
+    pub(crate) logical_size: [u16; 2],
 }
-// TODO: animations
-pub struct Frame {}
-pub struct SpriteFrames {}
-pub struct AnimatedSprite {}
+mod animation;
+pub use animation::{AnimatedSprite, Frame, SpriteFrames};
+#[derive(Clone)]
 pub struct Sprite {
     pub texture: Arc<Texture>,
     pub position: Vec2,
@@ -140,6 +150,88 @@ impl Sprite {
     pub fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
+    /// Center once on `"X"`, `"Y"`, or `"XY"` within the assigned surface,
+    /// or the default 1280×720 logical surface when none is assigned.
+    /// Size overrides scale; negative dimensions are treated as flips.
+    /// Panics if `axes` is not one of the three supported values.
+    pub fn center(&mut self, axes: &str) {
+        self.center_size(axes, self.signed_size().abs());
+    }
+    pub(crate) fn center_size(&mut self, axes: &str, size: Vec2) {
+        assert!(
+            matches!(axes, "X" | "Y" | "XY"),
+            "center axes must be X, Y, or XY"
+        );
+        let [width, height] = self.surface.map_or([1280, 720], |s| s.logical_size);
+        if axes != "Y" {
+            self.position.x = (f32::from(width) - size.x) * 0.5;
+        }
+        if axes != "X" {
+            self.position.y = (f32::from(height) - size.y) * 0.5;
+        }
+    }
+    pub(crate) fn geometry(&self, frame: Option<Frame>) -> (Vec2, Vec2, [f32; 4]) {
+        let signed = self.size.unwrap_or_else(|| {
+            frame.map_or_else(
+                || vec2(self.texture.width as f32, self.texture.height as f32),
+                |f| f.source_size,
+            ) * self.scale
+        });
+        let size = signed.abs();
+        let Some(f) = frame else {
+            return (
+                self.position,
+                size,
+                [
+                    if signed.x < 0. { 1. } else { 0. },
+                    if signed.y < 0. { 1. } else { 0. },
+                    if signed.x < 0. { -1. } else { 1. },
+                    if signed.y < 0. { -1. } else { 1. },
+                ],
+            );
+        };
+        if f.empty || f.source_size.x == 0. || f.source_size.y == 0. {
+            return (self.position, Vec2::ZERO, [0.; 4]);
+        }
+        let scale = vec2(size.x / f.source_size.x, size.y / f.source_size.y);
+        let trimmed = if f.rotated {
+            vec2(f.rect[3], f.rect[2])
+        } else {
+            vec2(f.rect[2], f.rect[3])
+        };
+        let flip_x = (signed.x < 0.) ^ f.flip_x;
+        let flip_y = (signed.y < 0.) ^ f.flip_y;
+        let offset = vec2(
+            if flip_x {
+                f.source_size.x - f.offset.x - trimmed.x
+            } else {
+                f.offset.x
+            },
+            if flip_y {
+                f.source_size.y - f.offset.y - trimmed.y
+            } else {
+                f.offset.y
+            },
+        ) * scale;
+        let tw = self.texture.width as f32;
+        let th = self.texture.height as f32;
+        let (fx, fy) = if f.rotated {
+            (flip_y, flip_x)
+        } else {
+            (flip_x, flip_y)
+        };
+        let uv = [
+            (f.rect[0] + if fx { f.rect[2] } else { 0. }) / tw,
+            (f.rect[1] + if fy { f.rect[3] } else { 0. }) / th,
+            f.rect[2] / tw * if fx { -1. } else { 1. },
+            f.rect[3] / th * if fy { -1. } else { 1. },
+        ];
+        (
+            vec2(self.position.x + offset.x, self.position.y + offset.y),
+            trimmed * scale,
+            uv,
+        )
+    }
     pub(crate) fn signed_size(&self) -> Vec2 {
         self.size.unwrap_or_else(|| {
             vec2(self.texture.width as f32, self.texture.height as f32) * self.scale
@@ -163,7 +255,7 @@ pub(crate) fn drawable_size(sprite: &Sprite, bounds: Vec2) -> Option<Vec2> {
         return None;
     }
     let c = sprite.color;
-    if !sprite.visible || c.a <= 0. || ![c.r, c.g, c.b, c.a].iter().all(|v| v.is_finite()) {
+    if c.a <= 0. || ![c.r, c.g, c.b, c.a].iter().all(|v| v.is_finite()) {
         return None;
     }
     let size = sprite.signed_size().abs();
@@ -174,6 +266,9 @@ mod tests;
 
 mod game;
 pub use game::{
-    Game, Scene, get_fps, get_key_just_pressed, get_key_pressed, get_mouse_button_pressed,
+    Game, SceneBehavior, get_fps, get_key_just_pressed, get_key_pressed, get_mouse_button_pressed,
     get_mouse_position, quit, switch_scene,
 };
+
+mod scene;
+pub use scene::{Handle, Scene, SceneObject};

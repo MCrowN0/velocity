@@ -12,13 +12,15 @@ struct VertexOut {
     @location(2) uv_rect: vec4<f32>, @location(3) color: vec4<f32>) -> VertexOut {
     let corner = vec2<f32>(f32(vertex & 1u), f32(vertex >> 1u));
     var out: VertexOut;
-    out.position = vec4((position + corner * size) / push.viewport * 2. - 1., 0., 1.);
-    out.uv = uv_rect.xy + corner * uv_rect.zw;
+    out.position = vec4((position + corner * abs(size)) / push.viewport * 2. - 1., 0., 1.);
+    // Geometry extents are positive; the unused X sign carries packed rotation.
+    let uv_corner = select(corner, vec2<f32>(1. - corner.y, corner.x), size.x < 0.);
+    out.uv = uv_rect.xy + uv_corner * uv_rect.zw;
     out.color = color;
     return out;
 }
 @fragment fn fs_main(in: VertexOut) -> @location(0) vec4<f32> {
     let color = textureSample(image, image_sampler, in.uv) * in.color;
     if push.premultiplied != 0u { return color; }
-    return vec4(color.rgb * color.a, color.a);
+    return vec4(color.rgb * in.color.a, color.a);
 }

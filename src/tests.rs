@@ -26,6 +26,51 @@ fn sprite() -> Sprite {
     Sprite::new(Arc::new(Texture::from_rgba(2, 2, vec![255; 16]).unwrap()))
 }
 #[test]
+fn center_respects_axes_scale_size_and_surface() {
+    let mut s = sprite();
+    s.position = vec2(7., 9.);
+    s.scale = vec2(-10., 20.);
+    s.center("X");
+    assert_eq!(s.position, vec2(630., 9.));
+    s.center("Y");
+    assert_eq!(s.position, vec2(630., 340.));
+    s.surface = Some(Surface {
+        renderer: 1,
+        index: 0,
+        logical_size: [100, 80],
+    });
+    s.size = Some(vec2(-120., 20.));
+    s.center("XY");
+    assert_eq!(s.position, vec2(-10., 30.));
+}
+#[test]
+fn animated_center_uses_current_untrimmed_frame() {
+    let mut frames = SpriteFrames::new(sprite().texture);
+    let mut frame = Frame::new([0., 0., 2., 2.]);
+    frame.source_size = vec2(100., 60.);
+    frame.offset = vec2(10., 15.);
+    frames.add_frame("first", frame).unwrap();
+    frames
+        .add_frame("second", Frame::new([0., 0., 40., 20.]))
+        .unwrap();
+    let mut s = AnimatedSprite::new(Arc::new(frames));
+    s.scale = vec2(-2., 3.);
+    s.center("XY");
+    assert_eq!(s.position, vec2(540., 270.));
+    s.add_animation("test", &[1], 0., false).unwrap();
+    s.play("test").unwrap();
+    s.center("X");
+    assert_eq!(s.position, vec2(600., 270.));
+    s.size = Some(vec2(20., -40.));
+    s.center("Y");
+    assert_eq!(s.position, vec2(600., 340.));
+}
+#[test]
+#[should_panic(expected = "center axes must be X, Y, or XY")]
+fn center_rejects_invalid_axes() {
+    sprite().center("Z");
+}
+#[test]
 fn rejects_invalid_images() {
     assert!(Texture::from_rgba(0, 1, vec![]).is_err());
     assert!(Texture::from_rgba(2, 2, vec![255; 15]).is_err());

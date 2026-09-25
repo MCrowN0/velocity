@@ -1,4 +1,4 @@
-use crate::{Assets, AudioEngine, Renderer, Vec2, Window, vec2};
+use crate::{Assets, AudioEngine, Renderer, Scene, Vec2, Window, vec2};
 use std::{
     cell::RefCell,
     sync::{
@@ -9,7 +9,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub trait Scene: Send + 'static {
+pub trait SceneBehavior: Send + 'static {
     /// Run this scene with the default game settings.
     fn run(self) -> Result<(), String>
     where
@@ -17,15 +17,15 @@ pub trait Scene: Send + 'static {
     {
         Game::new(self).run()
     }
-    fn enter(&mut self) {}
+    fn enter(&mut self, _scene: &mut Scene) {}
     /// Called once after enter, before updates. Load assets and add sprites here.
-    fn setup(&mut self, _renderer: &mut Renderer) -> Result<(), String> {
+    fn setup(&mut self, _scene: &mut Scene, _renderer: &mut Renderer) -> Result<(), String> {
         Ok(())
     }
-    fn exit(&mut self) {}
-    fn process(&mut self, _dt: f32) {}
-    fn tick(&mut self) {}
-    fn render(&mut self, _renderer: &mut Renderer) -> Result<(), String> {
+    fn exit(&mut self, _scene: &mut Scene) {}
+    fn process(&mut self, _scene: &mut Scene, _dt: f32) {}
+    fn tick(&mut self, _scene: &mut Scene) {}
+    fn render(&mut self, _scene: &mut Scene, _renderer: &mut Renderer) -> Result<(), String> {
         Ok(())
     }
 }
@@ -43,7 +43,7 @@ struct Context {
     assets: Option<Assets>,
     audio: Option<Arc<AudioEngine>>,
     input: Snapshot,
-    next: Option<Box<dyn Scene>>,
+    next: Option<Box<dyn SceneBehavior>>,
     quit: bool,
     active: bool,
 }
@@ -79,13 +79,17 @@ pub fn get_mouse_position() -> Vec2 {
 pub fn get_mouse_button_pressed(index: u8) -> bool {
     CONTEXT.with(|c| index < 3 && c.borrow().input.buttons & (1 << index) != 0)
 }
-pub fn get_key_pressed(key: u8) -> bool {
+/// Whether a named key or raw Windows virtual-key code is held.
+pub fn get_key_pressed(key: impl Into<u8>) -> bool {
+    let key = key.into();
     CONTEXT.with(|c| c.borrow().input.keys[key as usize / 64] & (1 << (key % 64)) != 0)
 }
-pub fn get_key_just_pressed(key: u8) -> bool {
+/// Whether a named key or raw Windows virtual-key code was pressed this frame.
+pub fn get_key_just_pressed(key: impl Into<u8>) -> bool {
+    let key = key.into();
     CONTEXT.with(|c| c.borrow().input.pressed[key as usize / 64] & (1 << (key % 64)) != 0)
 }
-pub fn switch_scene(scene: impl Scene) {
+pub fn switch_scene(scene: impl SceneBehavior) {
     CONTEXT.with(|c| {
         let mut c = c.borrow_mut();
         assert!(c.active, "switch_scene requires a scene callback");
@@ -103,13 +107,18 @@ pub fn quit() {
 struct Runtime {
     assets: Option<Assets>,
     audio: Option<Arc<AudioEngine>>,
-    scene: Box<dyn Scene>,
+    scene: Box<dyn SceneBehavior>,
+    objects: Scene,
     input: Snapshot,
-    next: Option<Box<dyn Scene>>,
+    next: Option<Box<dyn SceneBehavior>>,
     quit: bool,
 }
 impl Runtime {
-    fn call<T>(&mut self, tick: bool, callback: impl FnOnce(&mut dyn Scene) -> T) -> T {
+    fn call<T>(
+        &mut self,
+        tick: bool,
+        callback: impl FnOnce(&mut dyn SceneBehavior, &mut Scene) -> T,
+    ) -> T {
         let mut input = self.input;
         if tick {
             input.pressed = [0; 4];
@@ -130,7 +139,7 @@ impl Runtime {
             }
         }
         let _reset = Reset;
-        let result = callback(self.scene.as_mut());
+        let result = callback(self.scene.as_mut(), &mut self.objects);
         CONTEXT.with(|c| {
             let mut c = c.borrow_mut();
             if let Some(next) = c.next.take() {
@@ -169,7 +178,7 @@ impl Worker {
                             break;
                         }
                         if state.next.is_none() {
-                            state.call(true, |scene| scene.tick());
+                            state.call(true, |scene, objects| scene.tick(objects));
                         }
                     }
                     deadline += period;
@@ -209,10 +218,10 @@ pub struct Game {
     pub canvas_size: [u32; 2],
     pub resizable: bool,
     pub max_framerate: i32,
-    pub initial_scene: Box<dyn Scene>,
+    pub initial_scene: Box<dyn SceneBehavior>,
 }
 impl Game {
-    pub fn new(initial_scene: impl Scene) -> Self {
+    pub fn new(initial_scene: impl SceneBehavior) -> Self {
         Self {
             assets: Assets::new(),
             audio: AudioEngine::new(),
@@ -236,22 +245,28 @@ impl Game {
             assets: Some(self.assets),
             audio: Some(Arc::new(self.audio)),
             scene: self.initial_scene,
+            objects: Scene::new(),
             input: Snapshot::default(),
             next: None,
             quit: false,
         }));
         {
             let mut state = runtime.lock().unwrap();
-            state.call(false, |scene| scene.enter());
-            if let Err(error) = state.call(false, |scene| scene.setup(&mut renderer)) {
-                state.call(false, |scene| scene.exit());
+            state.call(false, |scene, objects| scene.enter(objects));
+            if let Err(error) =
+                state.call(false, |scene, objects| scene.setup(objects, &mut renderer))
+            {
+                state.call(false, |scene, objects| scene.exit(objects));
                 return Err(error);
             }
         }
         let mut worker = match Worker::start(runtime.clone()) {
             Ok(worker) => worker,
             Err(error) => {
-                runtime.lock().unwrap().call(false, |scene| scene.exit());
+                runtime
+                    .lock()
+                    .unwrap()
+                    .call(false, |scene, objects| scene.exit(objects));
                 return Err(error);
             }
         };
@@ -288,22 +303,24 @@ impl Game {
                         break;
                     }
                     if let Some(next) = state.next.take() {
-                        state.call(false, |scene| scene.exit());
-                        renderer.clear_scene()?;
+                        state.call(false, |scene, objects| scene.exit(objects));
+                        state.objects = Scene::new();
                         state.scene = next;
-                        state.call(false, |scene| scene.enter());
-                        state.call(false, |scene| scene.setup(&mut renderer))?;
+                        renderer.clear_scene()?;
+                        state.call(false, |scene, objects| scene.enter(objects));
+                        state.call(false, |scene, objects| scene.setup(objects, &mut renderer))?;
                     }
                     if state.quit {
                         break;
                     }
-                    state.call(false, |scene| scene.process(dt));
+                    state.call(false, |scene, objects| scene.process(objects, dt));
                     if state.quit {
                         break;
                     }
-                    state.call(false, |scene| scene.render(&mut renderer))?;
+                    state.objects.update_animations(dt);
+                    state.call(false, |scene, objects| scene.render(objects, &mut renderer))?;
+                    renderer.render(&mut state.objects)?;
                 }
-                renderer.render()?;
                 let period = if window.size().contains(&0) {
                     Some(Duration::from_millis(16))
                 } else {
@@ -317,7 +334,7 @@ impl Game {
         })();
         let joined = worker.finish();
         if let Ok(mut state) = runtime.lock() {
-            state.call(false, |scene| scene.exit());
+            state.call(false, |scene, objects| scene.exit(objects));
         }
         result.and(joined)
     }
@@ -327,16 +344,40 @@ impl Game {
 mod tests {
     use super::*;
     struct Empty;
-    impl Scene for Empty {}
+    impl SceneBehavior for Empty {}
     fn runtime() -> Runtime {
         Runtime {
             assets: None,
             audio: None,
             scene: Box::new(Empty),
+            objects: Scene::new(),
             input: Snapshot::default(),
             next: None,
             quit: false,
         }
+    }
+    #[test]
+    fn named_keys_share_raw_key_state() {
+        use crate::Key;
+
+        let mut state = runtime();
+        // WM_KEYDOWN supplies 0x28 for the Down arrow.
+        state.input.keys[0] = 1 << 0x28;
+        state.input.pressed[0] = 1 << 0x28;
+        state.call(false, |_, _| {
+            assert!(get_key_pressed(Key::Down));
+            assert!(get_key_pressed(0x28));
+            assert!(get_key_just_pressed(Key::Down));
+            assert!(get_key_just_pressed(0x28));
+            assert!(!get_key_pressed(Key::Up));
+            assert!(!get_key_just_pressed(Key::Up));
+        });
+        state.call(true, |_, _| {
+            assert!(get_key_pressed(Key::Down));
+            assert!(!get_key_just_pressed(Key::Down));
+        });
+        assert!(!get_key_pressed(Key::Down));
+        assert!(!get_key_just_pressed(Key::Down));
     }
     #[test]
     fn helpers_read_callback_snapshot_and_tick_has_no_frame_edges() {
@@ -346,7 +387,7 @@ mod tests {
         state.input.buttons = 5;
         state.input.keys[1] = 2; // A = 65
         state.input.pressed[1] = 2;
-        state.call(false, |_| {
+        state.call(false, |_, _| {
             assert_eq!(get_fps(), 120.);
             assert_eq!(get_mouse_position(), vec2(12., 34.));
             assert!(get_mouse_button_pressed(0));
@@ -358,7 +399,7 @@ mod tests {
             switch_scene(Empty);
         });
         assert!(state.next.is_some());
-        state.call(true, |_| {
+        state.call(true, |_, _| {
             assert!(get_key_pressed(b'A'));
             assert!(!get_key_just_pressed(b'A'));
             quit();
@@ -371,19 +412,19 @@ mod tests {
         let mut state = runtime();
         state.assets = Some(Assets::new());
         assert!(assets().is_err());
-        state.call(false, |_| assert!(assets().is_ok()));
-        state.call(true, |_| assert!(assets().is_ok()));
+        state.call(false, |_, _| assert!(assets().is_ok()));
+        state.call(true, |_, _| assert!(assets().is_ok()));
         assert!(assets().is_err());
     }
     #[test]
     fn panicking_callback_releases_pending_scene_and_context() {
         struct Tracked(Arc<()>);
-        impl Scene for Tracked {}
+        impl SceneBehavior for Tracked {}
         let tracked = Arc::new(());
         let mut state = runtime();
         state.assets = Some(Assets::new());
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            state.call(false, |_| {
+            state.call(false, |_, _| {
                 let scene = Tracked(tracked.clone());
                 assert_eq!(Arc::strong_count(&scene.0), 2);
                 switch_scene(scene);
@@ -398,8 +439,8 @@ mod tests {
     #[test]
     fn worker_runs_elsewhere_and_stops_promptly() {
         struct Tick(std::sync::mpsc::Sender<thread::ThreadId>);
-        impl Scene for Tick {
-            fn tick(&mut self) {
+        impl SceneBehavior for Tick {
+            fn tick(&mut self, _scene: &mut Scene) {
                 self.0.send(thread::current().id()).unwrap();
                 quit();
             }
@@ -418,8 +459,8 @@ mod tests {
     #[test]
     fn worker_panic_is_reported_and_joined() {
         struct Panics;
-        impl Scene for Panics {
-            fn tick(&mut self) {
+        impl SceneBehavior for Panics {
+            fn tick(&mut self, _scene: &mut Scene) {
                 panic!("test panic");
             }
         }

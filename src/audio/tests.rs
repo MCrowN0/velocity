@@ -56,6 +56,20 @@ fn wait_for(mut condition: impl FnMut() -> bool) {
         thread::sleep(Duration::from_millis(2));
     }
 }
+fn stream_matches(player: &AudioPlayer, condition: impl FnOnce(&stream::Buffer) -> bool) -> bool {
+    player
+        .0
+        .lock()
+        .unwrap()
+        .stream
+        .as_ref()
+        .unwrap()
+        .try_buffer()
+        .is_some_and(|buffer| condition(&buffer))
+}
+fn stream_player(wave: &Wave) -> AudioPlayer {
+    AudioPlayer::new(AudioSource::load_with_mode(&wave.0, AudioLoadMode::Stream).unwrap()).unwrap()
+}
 #[test]
 fn repeated_player_drop_releases_voice_source_and_decoder_buffer() {
     let wave = Wave::new(8000, 2, 1000, false);
@@ -147,45 +161,23 @@ fn auto_uses_decoded_f32_size_and_modes_override_it() {
 #[test]
 fn streaming_is_bounded_refills_and_seeks_without_stale_samples() {
     let wave = Wave::new(8000, 2, 1000, false);
-    let player =
-        AudioPlayer::new(AudioSource::load_with_mode(&wave.0, AudioLoadMode::Stream).unwrap())
-            .unwrap();
-    let buffered = || {
-        player
-            .0
-            .lock()
-            .unwrap()
-            .stream
-            .as_ref()
-            .unwrap()
-            .try_buffer()
-            .map_or(0, |b| b.frames.len())
-    };
-    wait_for(|| buffered() == 3000);
+    let player = stream_player(&wave);
+    let full = || stream_matches(&player, |b| b.frames.len() == 3000);
+    wait_for(full);
     thread::sleep(Duration::from_millis(20));
-    assert_eq!(buffered(), 3000);
+    assert!(full());
     player.play();
     player.0.lock().unwrap().mix(&mut [[0.; 2]; 2000], 1000);
-    wait_for(|| buffered() == 3000);
+    wait_for(full);
     player.seek(Duration::from_millis(5143));
-    wait_for(|| {
-        player
-            .0
-            .lock()
-            .unwrap()
-            .stream
-            .as_ref()
-            .unwrap()
-            .try_buffer()
-            .is_some_and(|b| b.eof && b.frames.len() == 2857)
-    });
+    wait_for(|| stream_matches(&player, |b| b.eof && b.frames.len() == 2857));
     let mut out = [[0.; 2]; 10];
     player.0.lock().unwrap().mix(&mut out, 1000);
     assert!((out[0][0] - 0.43).abs() < 1e-6, "{out:?}");
     assert!(player.error().is_none());
     player.seek(Duration::from_millis(120));
     player.seek(Duration::from_millis(740));
-    wait_for(|| buffered() == 3000);
+    wait_for(full);
     out.fill([0.; 2]);
     player.0.lock().unwrap().mix(&mut out, 1000);
     assert!((out[0][0] - 0.40).abs() < 1e-6);
@@ -277,20 +269,8 @@ fn flac_decode_and_sample_accurate_seek() {
 fn streamed_resampling_matches_memory_at_eof_and_seek_to_end_is_clean() {
     let wave = Wave::new(100, 1, 1000, false);
     let memory = AudioPlayer::new(AudioSource::load(&wave.0).unwrap()).unwrap();
-    let stream =
-        AudioPlayer::new(AudioSource::load_with_mode(&wave.0, AudioLoadMode::Stream).unwrap())
-            .unwrap();
-    wait_for(|| {
-        stream
-            .0
-            .lock()
-            .unwrap()
-            .stream
-            .as_ref()
-            .unwrap()
-            .try_buffer()
-            .is_some_and(|b| b.eof)
-    });
+    let stream = stream_player(&wave);
+    wait_for(|| stream_matches(&stream, |b| b.eof));
     for rate in [500, 1000, 2000] {
         memory.play();
         stream.play();
@@ -302,17 +282,7 @@ fn streamed_resampling_matches_memory_at_eof_and_seek_to_end_is_clean() {
         assert!(!stream.is_playing());
         memory.stop();
         stream.stop();
-        wait_for(|| {
-            stream
-                .0
-                .lock()
-                .unwrap()
-                .stream
-                .as_ref()
-                .unwrap()
-                .try_buffer()
-                .is_some_and(|b| b.eof)
-        });
+        wait_for(|| stream_matches(&stream, |b| b.eof));
     }
     stream.seek(Duration::from_secs(99));
     assert_eq!(stream.position(), Duration::from_millis(100));
@@ -444,9 +414,7 @@ fn mixer_percentiles() {
 fn wasapi_device_smoke() {
     let wave = Wave::new(48000, 1, 48000, true);
     let memory = AudioPlayer::new(AudioSource::load(&wave.0).unwrap()).unwrap();
-    let stream =
-        AudioPlayer::new(AudioSource::load_with_mode(&wave.0, AudioLoadMode::Stream).unwrap())
-            .unwrap();
+    let stream = stream_player(&wave);
     memory.set_volume(0.).unwrap();
     stream.set_volume(0.).unwrap();
     let mut engine = AudioEngine::new();

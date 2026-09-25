@@ -157,10 +157,12 @@ impl Window {
     pub fn input(&self) -> Input {
         self.0.state.input.get()
     }
-    pub fn key_down(&self, key: u8) -> bool {
+    pub fn key_down(&self, key: impl Into<u8>) -> bool {
+        let key = key.into();
         self.0.state.keys[key as usize].get()
     }
-    pub fn key_just_pressed(&self, key: u8) -> bool {
+    pub fn key_just_pressed(&self, key: impl Into<u8>) -> bool {
+        let key = key.into();
         self.0.state.just_pressed[key as usize].get()
     }
     pub fn set_resizable(&self, resizable: bool) {
