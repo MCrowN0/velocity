@@ -10,8 +10,7 @@ struct VertexOut {
 @vertex fn vs_main(@builtin(vertex_index) vertex: u32,
     @location(0) position: vec2<f32>, @location(1) size: vec2<f32>,
     @location(2) uv_rect: vec4<f32>, @location(3) color: vec4<f32>) -> VertexOut {
-    var corners = array<vec2<f32>, 6>(vec2(0., 0.), vec2(1., 0.), vec2(0., 1.), vec2(0., 1.), vec2(1., 0.), vec2(1., 1.));
-    let corner = corners[vertex];
+    let corner = vec2<f32>(f32(vertex & 1u), f32(vertex >> 1u));
     var out: VertexOut;
     out.position = vec4((position + corner * size) / push.viewport * 2. - 1., 0., 1.);
     out.uv = uv_rect.xy + corner * uv_rect.zw;

@@ -33,7 +33,8 @@ impl Scene for TestScene {
             "tick worker or transition stalled"
         );
     }
-    fn render(&mut self, renderer: &mut Renderer) -> Result<(), String> {
+    fn setup(&mut self, renderer: &mut Renderer) -> Result<(), String> {
+        assert!(!self.rendered, "setup must run only once");
         if !self.rendered {
             assert!(
                 renderer.sprites.is_empty(),
@@ -89,6 +90,23 @@ fn main() -> Result<(), String> {
         *log.lock().unwrap(),
         ["enter1", "tick1", "exit1", "enter2", "tick2", "exit2"]
     );
+    struct FailedSetup(Arc<Mutex<Vec<&'static str>>>);
+    impl Scene for FailedSetup {
+        fn setup(&mut self, _: &mut Renderer) -> Result<(), String> {
+            Err("setup failure".into())
+        }
+        fn exit(&mut self) {
+            self.0.lock().unwrap().push("exit");
+        }
+    }
+    impl Drop for FailedSetup {
+        fn drop(&mut self) {
+            self.0.lock().unwrap().push("drop");
+        }
+    }
+    log.lock().unwrap().clear();
+    assert_eq!(FailedSetup(log.clone()).run(), Err("setup failure".into()));
+    assert_eq!(*log.lock().unwrap(), ["exit", "drop"]);
     println!("PASS: worker thread, lifecycle, transitions, scene cleanup, shutdown");
     Ok(())
 }

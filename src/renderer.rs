@@ -105,6 +105,8 @@ struct SurfaceTarget {
     logical: Vec2,
     origin: Vec2,
     scale: Vec2,
+    clip_min: Vec2,
+    clip_max: Vec2,
     list: DrawList,
     initialized: bool,
     visible: bool,
@@ -337,6 +339,7 @@ pub struct Renderer {
     frames: Vec<Frame>,
     frame: usize,
     textures: HashMap<usize, CachedTexture>,
+    uploader: Rc<assets::Uploader>,
     surfaces: Vec<SurfaceTarget>,
     window_list: DrawList,
     instance_bytes: usize,
@@ -361,6 +364,7 @@ impl Renderer {
                 index: 0,
             },
             clear_color: Color::BLACK,
+            uploader: assets::Uploader::new(device.clone()),
             device,
             window: window.clone(),
             id,
@@ -385,8 +389,11 @@ impl Renderer {
     pub fn gpu_name(&self) -> &str {
         &self.device.name
     }
+    pub fn attach_assets(&self, assets: &Assets) -> Result<()> {
+        assets.attach(&self.uploader)
+    }
     pub fn cached_texture_count(&self) -> usize {
-        self.textures.len()
+        self.textures.len() + self.uploader.textures.borrow().len()
     }
     pub fn add_sprite(&mut self, sprite: Sprite) {
         self.sprites.push(sprite);
@@ -406,6 +413,8 @@ impl Renderer {
             logical: vec2(width as f32, height as f32),
             origin: Vec2::ZERO,
             scale: Vec2::ONE,
+            clip_min: Vec2::ZERO,
+            clip_max: vec2(width as f32, height as f32),
             list: DrawList::default(),
             initialized: false,
             visible: false,
@@ -470,13 +479,25 @@ impl Renderer {
         ))
     }
     pub(crate) fn clear_scene(&mut self) -> Result<()> {
-        unsafe {
-            self.device.raw.device_wait_idle().map_err(error)?;
-        }
         self.sprites.clear();
+        self.collect_unused()?;
         self.surfaces.clear();
         self.id = NEXT_RENDERER.fetch_add(1, Ordering::Relaxed);
         self.default_surface = self.create_surface(1280, 720, Vec2::ZERO)?;
+        Ok(())
+    }
+    /// Release unused GPU textures now, including while minimized. Waits for the GPU.
+    pub fn collect_unused(&mut self) -> Result<()> {
+        unsafe {
+            self.device.raw.device_wait_idle().map_err(error)?;
+        }
+        self.textures
+            .retain(|_, cached| cached.source.strong_count() != 0);
+        self.uploader.collect_unused();
+        self.uploader.garbage.borrow_mut().clear();
+        for frame in &mut self.frames {
+            frame.garbage.clear();
+        }
         Ok(())
     }
     pub fn render(&mut self) -> Result<RenderStats> {
@@ -494,6 +515,14 @@ impl Renderer {
             let (origin, pixels) = surface_layout(surface.logical, size, surface.position);
             surface.origin = origin;
             surface.scale = vec2(pixels.x / surface.logical.x, pixels.y / surface.logical.y);
+            surface.clip_min = vec2(
+                (-origin.x / surface.scale.x).max(0.),
+                (-origin.y / surface.scale.y).max(0.),
+            );
+            surface.clip_max = vec2(
+                ((size.x - origin.x) / surface.scale.x).min(surface.logical.x),
+                ((size.y - origin.y) / surface.scale.y).min(surface.logical.y),
+            );
             surface.visible = intersects(origin, pixels, size);
             if surface.visible
                 && (surface.image.width != pixels.x as u32
@@ -511,62 +540,104 @@ impl Renderer {
                 .extract_if(|_, cached| cached.source.strong_count() == 0)
                 .map(|(_, cached)| cached.image),
         );
-        for sprite in &self.sprites {
-            let handle = sprite.surface.unwrap_or(self.default_surface);
-            if handle.renderer != self.id {
-                stats.culled += 1;
+        self.uploader.collect_unused();
+        self.frames[self.frame]
+            .garbage
+            .append(&mut self.uploader.garbage.borrow_mut());
+        let asset_textures = self.uploader.textures.borrow();
+        // Only valid during this preparation: public sprite/texture fields may change
+        // between frames. Reuse descriptors across adjacent visible texture runs.
+        let mut last_texture = None;
+        let default_bounds = self
+            .surfaces
+            .get(self.default_surface.index)
+            .map(|s| s.clip_max);
+        for chunk in self.sprites.chunks(4) {
+            // SSE2 is baseline on Windows x64. Four independent positions at once,
+            // without following texture pointers or building temporary bounds arrays.
+            if default_bounds.is_some_and(|bounds| reject_default_chunk(chunk, bounds)) {
+                stats.culled += chunk.len();
                 continue;
             }
-            let target = &self.surfaces[handle.index];
-            if !target.visible {
-                stats.culled += 1;
-                continue;
-            }
-            let bounds = target.logical;
-            let Some(sprite_size) = drawable_size(sprite, bounds) else {
-                stats.culled += 1;
-                continue;
-            };
-            {
-                let target = &self.surfaces[handle.index];
-                let origin = target.origin;
-                let local = sprite.position * target.scale;
-                if !intersects(
-                    vec2(origin.x + local.x, origin.y + local.y),
-                    sprite_size * target.scale,
-                    size,
-                ) {
+            for sprite in chunk {
+                if !sprite.visible || sprite.color.a <= 0. {
                     stats.culled += 1;
                     continue;
                 }
-            }
-            let key = Arc::as_ptr(&sprite.texture) as usize;
-            let descriptor = match self.textures.entry(key) {
-                std::collections::hash_map::Entry::Occupied(entry) => entry.get().image.descriptor,
-                std::collections::hash_map::Entry::Vacant(entry) => {
-                    let image = Image::new(
-                        &self.device,
-                        sprite.texture.width() as u32,
-                        sprite.texture.height() as u32,
-                        false,
-                    )?;
-                    image.upload(sprite.texture.pixels())?;
-                    let descriptor = image.descriptor;
-                    entry.insert(CachedTexture {
-                        source: Arc::downgrade(&sprite.texture),
-                        image,
-                    });
-                    stats.texture_uploads += 1;
-                    stats.uploaded_bytes += sprite.texture.pixels().len();
-                    descriptor
+                let handle = sprite.surface.unwrap_or(self.default_surface);
+                if handle.renderer != self.id {
+                    stats.culled += 1;
+                    continue;
                 }
-            };
-            let mut instance = SpriteInstance::sprite(sprite);
-            instance.position = instance.position * self.surfaces[handle.index].scale;
-            instance.size = instance.size * self.surfaces[handle.index].scale;
-            let list = &mut self.surfaces[handle.index].list;
-            list.push(instance, descriptor, false);
-            stats.drawn += 1;
+                let target = &self.surfaces[handle.index];
+                if !target.visible {
+                    stats.culled += 1;
+                    continue;
+                }
+                let bounds = target.clip_max;
+                let Some(sprite_size) = drawable_size(sprite, bounds) else {
+                    stats.culled += 1;
+                    continue;
+                };
+                {
+                    if sprite.position.x + sprite_size.x <= target.clip_min.x
+                        || sprite.position.y + sprite_size.y <= target.clip_min.y
+                    {
+                        stats.culled += 1;
+                        continue;
+                    }
+                }
+                let position = sprite.position * target.scale;
+                let scaled_size = sprite_size * target.scale;
+                if !position.is_finite() || !scaled_size.is_finite() {
+                    stats.culled += 1;
+                    continue;
+                }
+                let key = Arc::as_ptr(&sprite.texture) as usize;
+                let descriptor = if let Some((_, descriptor)) =
+                    last_texture.filter(|(previous, _)| *previous == key)
+                {
+                    descriptor
+                } else if let Some(gpu) = &sprite.texture.gpu {
+                    if gpu.owner != self.uploader.id {
+                        return Err("texture belongs to another renderer".into());
+                    }
+                    asset_textures
+                        .get(&gpu.key)
+                        .ok_or("GPU texture is no longer available")?
+                        .descriptor
+                } else {
+                    match self.textures.entry(key) {
+                        std::collections::hash_map::Entry::Occupied(entry) => {
+                            entry.get().image.descriptor
+                        }
+                        std::collections::hash_map::Entry::Vacant(entry) => {
+                            let image = Image::new(
+                                &self.device,
+                                sprite.texture.width() as u32,
+                                sprite.texture.height() as u32,
+                                false,
+                            )?;
+                            image.upload(sprite.texture.pixels())?;
+                            let descriptor = image.descriptor;
+                            entry.insert(CachedTexture {
+                                source: Arc::downgrade(&sprite.texture),
+                                image,
+                            });
+                            stats.texture_uploads += 1;
+                            stats.uploaded_bytes += sprite.texture.pixels().len();
+                            descriptor
+                        }
+                    }
+                };
+                last_texture = Some((key, descriptor));
+                let mut instance = SpriteInstance::sprite(sprite);
+                instance.position = position;
+                instance.size = scaled_size;
+                let list = &mut self.surfaces[handle.index].list;
+                list.push(instance, descriptor, false);
+                stats.drawn += 1;
+            }
         }
         for surface in &self.surfaces {
             if surface.visible && !surface.list.instances.is_empty() {
@@ -853,6 +924,40 @@ impl Renderer {
         }
     }
 }
+
+#[inline]
+fn reject_default_chunk(sprites: &[Sprite], bounds: Vec2) -> bool {
+    if sprites.len() != 4 {
+        return false;
+    }
+    #[cfg(target_arch = "x86_64")]
+    unsafe {
+        use std::arch::x86_64::*;
+        let x = _mm_set_ps(
+            sprites[3].position.x,
+            sprites[2].position.x,
+            sprites[1].position.x,
+            sprites[0].position.x,
+        );
+        let y = _mm_set_ps(
+            sprites[3].position.y,
+            sprites[2].position.y,
+            sprites[1].position.y,
+            sprites[0].position.y,
+        );
+        let outside = _mm_or_ps(
+            _mm_cmpge_ps(x, _mm_set1_ps(bounds.x)),
+            _mm_cmpge_ps(y, _mm_set1_ps(bounds.y)),
+        );
+        // Check handles only for rejected groups; visible groups take the ordinary
+        // path without an extra pass over their surface fields.
+        _mm_movemask_ps(outside) == 15 && sprites.iter().all(|s| s.surface.is_none())
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    sprites
+        .iter()
+        .all(|s| s.surface.is_none() && (s.position.x >= bounds.x || s.position.y >= bounds.y))
+}
 impl Drop for Renderer {
     fn drop(&mut self) {
         unsafe {
@@ -962,7 +1067,7 @@ unsafe fn draw_pass(
                     &[batch.descriptor],
                     &[],
                 );
-                device.raw.cmd_draw(cmd, 6, batch.count, 0, batch.first);
+                device.raw.cmd_draw(cmd, 4, batch.count, 0, batch.first);
             }
         }
         device.raw.cmd_end_rendering(cmd);
@@ -1003,5 +1108,45 @@ pub(crate) fn canvas_rect(canvas: [u32; 2], extent: vk::Extent2D) -> vk::Rect2D 
             width: width as u32,
             height: height as u32,
         },
+    }
+}
+
+#[cfg(test)]
+#[path = "renderer_perf.rs"]
+mod perf;
+
+#[cfg(test)]
+mod lifetime_tests {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires a Vulkan GPU"]
+    fn gpu_resources_are_released_after_texture_churn_and_renderer_drop() {
+        for _ in 0..4 {
+            let window = Window::with_visibility("Lifetime test", 64, 64, false).unwrap();
+            let mut renderer = Renderer::with_vsync(&window, false).unwrap();
+            let device = Rc::downgrade(&renderer.device);
+            let uploader = Rc::downgrade(&renderer.uploader);
+            let instance = Rc::downgrade(&renderer.device.instance);
+            for _ in 0..8 {
+                let mut handles = Vec::new();
+                for _ in 0..64 {
+                    let texture = Arc::new(Texture::from_rgba(1, 1, vec![255; 4]).unwrap());
+                    handles.push(Arc::downgrade(&texture));
+                    renderer.sprites.push(Sprite::new(texture));
+                }
+                renderer.render().unwrap();
+                assert_eq!(renderer.cached_texture_count(), 64);
+                renderer.sprites.clear();
+                renderer.collect_unused().unwrap();
+                assert_eq!(renderer.cached_texture_count(), 0);
+                assert!(handles.iter().all(|handle| handle.upgrade().is_none()));
+                assert!(renderer.frames.iter().all(|frame| frame.garbage.is_empty()));
+            }
+            drop(renderer);
+            assert!(uploader.upgrade().is_none());
+            assert!(device.upgrade().is_none());
+            assert!(instance.upgrade().is_none());
+        }
     }
 }

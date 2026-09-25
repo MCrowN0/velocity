@@ -1,4 +1,4 @@
-use crate::{AudioEngine, Renderer, Vec2, Window, vec2};
+use crate::{Assets, AudioEngine, Renderer, Vec2, Window, vec2};
 use std::{
     cell::RefCell,
     sync::{
@@ -10,7 +10,18 @@ use std::{
 };
 
 pub trait Scene: Send + 'static {
+    /// Run this scene with the default game settings.
+    fn run(self) -> Result<(), String>
+    where
+        Self: Sized,
+    {
+        Game::new(self).run()
+    }
     fn enter(&mut self) {}
+    /// Called once after enter, before updates. Load assets and add sprites here.
+    fn setup(&mut self, _renderer: &mut Renderer) -> Result<(), String> {
+        Ok(())
+    }
     fn exit(&mut self) {}
     fn process(&mut self, _dt: f32) {}
     fn tick(&mut self) {}
@@ -29,6 +40,7 @@ struct Snapshot {
 }
 #[derive(Default)]
 struct Context {
+    assets: Option<Assets>,
     audio: Option<Arc<AudioEngine>>,
     input: Snapshot,
     next: Option<Box<dyn Scene>>,
@@ -36,6 +48,14 @@ struct Context {
     active: bool,
 }
 thread_local! { static CONTEXT: RefCell<Context> = RefCell::new(Context::default()); }
+pub(crate) fn assets() -> Result<Assets, String> {
+    CONTEXT.with(|c| {
+        c.borrow()
+            .assets
+            .clone()
+            .ok_or_else(|| "get_assets requires a scene callback".into())
+    })
+}
 
 pub(crate) fn with_audio<T>(
     f: impl FnOnce(&AudioEngine) -> Result<T, String>,
@@ -81,6 +101,7 @@ pub fn quit() {
 }
 
 struct Runtime {
+    assets: Option<Assets>,
     audio: Option<Arc<AudioEngine>>,
     scene: Box<dyn Scene>,
     input: Snapshot,
@@ -95,6 +116,7 @@ impl Runtime {
         }
         CONTEXT.with(|c| {
             *c.borrow_mut() = Context {
+                assets: self.assets.clone(),
                 audio: self.audio.clone(),
                 input,
                 active: true,
@@ -180,6 +202,7 @@ impl Drop for Worker {
 }
 
 pub struct Game {
+    pub assets: Assets,
     pub audio: AudioEngine,
     pub title: String,
     /// Initial client size and fixed canvas aspect ratio, preserved on resize.
@@ -191,6 +214,7 @@ pub struct Game {
 impl Game {
     pub fn new(initial_scene: impl Scene) -> Self {
         Self {
+            assets: Assets::new(),
             audio: AudioEngine::new(),
             title: "Velocity".into(),
             canvas_size: [1280, 720],
@@ -206,16 +230,31 @@ impl Game {
         let window = Window::new(&self.title, self.canvas_size[0], self.canvas_size[1])?;
         window.set_resizable(self.resizable);
         let mut renderer = Renderer::with_vsync(&window, false)?;
+        renderer.attach_assets(&self.assets)?;
         self.audio.start()?;
         let runtime = Arc::new(Mutex::new(Runtime {
+            assets: Some(self.assets),
             audio: Some(Arc::new(self.audio)),
             scene: self.initial_scene,
             input: Snapshot::default(),
             next: None,
             quit: false,
         }));
-        runtime.lock().unwrap().call(false, |scene| scene.enter());
-        let mut worker = Worker::start(runtime.clone())?;
+        {
+            let mut state = runtime.lock().unwrap();
+            state.call(false, |scene| scene.enter());
+            if let Err(error) = state.call(false, |scene| scene.setup(&mut renderer)) {
+                state.call(false, |scene| scene.exit());
+                return Err(error);
+            }
+        }
+        let mut worker = match Worker::start(runtime.clone()) {
+            Ok(worker) => worker,
+            Err(error) => {
+                runtime.lock().unwrap().call(false, |scene| scene.exit());
+                return Err(error);
+            }
+        };
         let frame_period = (self.max_framerate > 0)
             .then(|| Duration::from_secs_f64(1. / self.max_framerate as f64));
         let result = (|| {
@@ -253,6 +292,7 @@ impl Game {
                         renderer.clear_scene()?;
                         state.scene = next;
                         state.call(false, |scene| scene.enter());
+                        state.call(false, |scene| scene.setup(&mut renderer))?;
                     }
                     if state.quit {
                         break;
@@ -290,6 +330,7 @@ mod tests {
     impl Scene for Empty {}
     fn runtime() -> Runtime {
         Runtime {
+            assets: None,
             audio: None,
             scene: Box::new(Empty),
             input: Snapshot::default(),
@@ -324,6 +365,35 @@ mod tests {
         });
         assert!(state.quit);
         assert!(!get_key_pressed(b'A'));
+    }
+    #[test]
+    fn assets_are_available_in_callbacks_and_reset_afterward() {
+        let mut state = runtime();
+        state.assets = Some(Assets::new());
+        assert!(assets().is_err());
+        state.call(false, |_| assert!(assets().is_ok()));
+        state.call(true, |_| assert!(assets().is_ok()));
+        assert!(assets().is_err());
+    }
+    #[test]
+    fn panicking_callback_releases_pending_scene_and_context() {
+        struct Tracked(Arc<()>);
+        impl Scene for Tracked {}
+        let tracked = Arc::new(());
+        let mut state = runtime();
+        state.assets = Some(Assets::new());
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            state.call(false, |_| {
+                let scene = Tracked(tracked.clone());
+                assert_eq!(Arc::strong_count(&scene.0), 2);
+                switch_scene(scene);
+                panic!("callback failure");
+            });
+        }));
+        assert!(result.is_err());
+        assert_eq!(Arc::strong_count(&tracked), 1);
+        assert!(assets().is_err());
+        CONTEXT.with(|c| assert!(!c.borrow().active));
     }
     #[test]
     fn worker_runs_elsewhere_and_stops_promptly() {

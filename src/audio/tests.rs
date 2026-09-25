@@ -57,6 +57,34 @@ fn wait_for(mut condition: impl FnMut() -> bool) {
     }
 }
 #[test]
+fn repeated_player_drop_releases_voice_source_and_decoder_buffer() {
+    let wave = Wave::new(8000, 2, 1000, false);
+    for mode in [AudioLoadMode::Memory, AudioLoadMode::Stream] {
+        let source = AudioSource::load_with_mode(&wave.0, mode).unwrap();
+        let source_weak = Arc::downgrade(&source.0);
+        let engine = AudioEngine::new();
+        for _ in 0..32 {
+            let player = AudioPlayer::new(source.clone()).unwrap();
+            engine.play(&player).unwrap();
+            let voice = Arc::downgrade(&player.0);
+            let released = player
+                .0
+                .lock()
+                .unwrap()
+                .stream
+                .as_ref()
+                .map(|s| s.released_probe());
+            drop(player);
+            assert!(voice.upgrade().is_none());
+            if let Some(released) = released {
+                wait_for(released);
+            }
+        }
+        drop(source);
+        assert!(source_weak.upgrade().is_none());
+    }
+}
+#[test]
 fn memory_decode_controls_and_independent_players() {
     let wave = Wave::new(100, 1, 1000, false);
     let source = AudioSource::load(&wave.0).unwrap();
@@ -263,7 +291,7 @@ fn streamed_resampling_matches_memory_at_eof_and_seek_to_end_is_clean() {
             .try_buffer()
             .is_some_and(|b| b.eof)
     });
-    for rate in [500, 2000] {
+    for rate in [500, 1000, 2000] {
         memory.play();
         stream.play();
         let mut expected = [[0.; 2]; 250];
@@ -322,6 +350,91 @@ fn mixer_benchmark() {
             "{count} voices, 10 seconds at 48 kHz: {:?} mixer time",
             start.elapsed()
         );
+    }
+}
+
+#[test]
+fn matching_rate_blocks_preserve_mix_seek_and_eof() {
+    for pcm in [
+        Pcm::Mono(vec![0.25, -0.5, 0.75].into()),
+        Pcm::Stereo(vec![[0.25, -0.25], [-0.5, 0.5], [0.75, -0.75]].into()),
+    ] {
+        let expected: Vec<_> = (0..pcm.len()).map(|i| pcm.frame(i)).collect();
+        let source = AudioSource(Arc::new(Source {
+            rate: 48000,
+            duration: None,
+            data: Data::Memory(pcm),
+        }));
+        let player = AudioPlayer::new(source).unwrap();
+        let mut voice = player.0.lock().unwrap();
+        voice.playing = true;
+        voice.volume = 0.5;
+        let mut output = [[0.1; 2]; 5];
+        voice.mix(&mut output, 48000);
+        for i in 0..3 {
+            for c in 0..2 {
+                assert_eq!(output[i][c], 0.1 + expected[i][c] * 0.5);
+            }
+        }
+        assert_eq!(&output[3..], &[[0.1; 2]; 2]);
+        assert_eq!(voice.cursor, 3.);
+        assert!(voice.ended && !voice.playing);
+        voice.cursor = 0.5;
+        voice.playing = true;
+        let mut output = [[0.; 2]; 1];
+        voice.mix(&mut output, 48000);
+        for c in 0..2 {
+            assert_eq!(
+                output[0][c],
+                (expected[0][c] + (expected[1][c] - expected[0][c]) * 0.5) * 0.5
+            );
+        }
+    }
+}
+
+#[test]
+#[ignore = "release CPU mixer percentiles"]
+fn mixer_percentiles() {
+    for rate in [44100, 48000] {
+        for stereo in [false, true] {
+            let pcm = if stereo {
+                Pcm::Stereo(vec![[0.01, -0.01]; 48000].into())
+            } else {
+                Pcm::Mono(vec![0.01; 48000].into())
+            };
+            let source = AudioSource(Arc::new(Source {
+                rate,
+                duration: None,
+                data: Data::Memory(pcm),
+            }));
+            let players: Vec<_> = (0..32)
+                .map(|_| AudioPlayer::new(source.clone()).unwrap())
+                .collect();
+            let mut voices: Vec<_> = players.iter().map(|p| p.0.lock().unwrap()).collect();
+            let mut samples = Vec::new();
+            let mut output = [[0.; 2]; 480];
+            for i in 0..2200 {
+                for voice in &mut voices {
+                    voice.cursor = 0.;
+                    voice.playing = true;
+                }
+                output.fill([0.; 2]);
+                let start = Instant::now();
+                for voice in &mut voices {
+                    voice.mix(std::hint::black_box(&mut output), 48000);
+                }
+                let ms = start.elapsed().as_secs_f64() * 1000.;
+                std::hint::black_box(&output);
+                if i >= 200 {
+                    samples.push(ms);
+                }
+            }
+            samples.sort_by(f64::total_cmp);
+            println!(
+                "audio 32 voices rate={rate} stereo={stereo}, 480 frames: median={:.6} p95={:.6} p99={:.6} ms",
+                samples[1000], samples[1900], samples[1980]
+            );
+        }
     }
 }
 

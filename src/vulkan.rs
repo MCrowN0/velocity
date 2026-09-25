@@ -134,11 +134,15 @@ impl Device {
             let extensions = [ash::khr::swapchain::NAME.as_ptr()];
             let mut features =
                 vk::PhysicalDeviceVulkan13Features::default().dynamic_rendering(true);
+            let supported = instance.raw.get_physical_device_features(physical);
+            let core_features = vk::PhysicalDeviceFeatures::default()
+                .texture_compression_bc(supported.texture_compression_bc != 0);
             let raw = instance
                 .raw
                 .create_device(
                     physical,
                     &vk::DeviceCreateInfo::default()
+                        .enabled_features(&core_features)
                         .queue_create_infos(&queues)
                         .enabled_extension_names(&extensions)
                         .push_next(&mut features),
@@ -223,6 +227,23 @@ impl Device {
         }
     }
 
+    pub fn check_texture_format(&self, format: vk::Format) -> Result<()> {
+        let features = unsafe {
+            self.instance
+                .raw
+                .get_physical_device_format_properties(self.physical, format)
+        };
+        if !features
+            .optimal_tiling_features
+            .contains(vk::FormatFeatureFlags::SAMPLED_IMAGE | vk::FormatFeatureFlags::TRANSFER_DST)
+        {
+            return Err(format!(
+                "GPU does not support texture format {}",
+                format.as_raw()
+            ));
+        }
+        Ok(())
+    }
     fn memory_type(&self, bits: u32, flags: vk::MemoryPropertyFlags) -> Result<u32> {
         (0..self.memory.memory_type_count)
             .find(|&i| {
@@ -379,7 +400,7 @@ impl Device {
                     .vertex_binding_descriptions(&bindings)
                     .vertex_attribute_descriptions(&attributes);
                 let assembly = vk::PipelineInputAssemblyStateCreateInfo::default()
-                    .topology(vk::PrimitiveTopology::TRIANGLE_LIST);
+                    .topology(vk::PrimitiveTopology::TRIANGLE_STRIP);
                 let viewport = vk::PipelineViewportStateCreateInfo::default()
                     .viewport_count(1)
                     .scissor_count(1);
@@ -588,6 +609,15 @@ pub(crate) struct Image {
 }
 impl Image {
     pub fn new(device: &Rc<Device>, width: u32, height: u32, target: bool) -> Result<Self> {
+        Self::with_format(device, width, height, target, IMAGE_FORMAT)
+    }
+    pub fn with_format(
+        device: &Rc<Device>,
+        width: u32,
+        height: u32,
+        target: bool,
+        format: vk::Format,
+    ) -> Result<Self> {
         unsafe {
             if width == 0
                 || height == 0
@@ -615,7 +645,7 @@ impl Image {
                 .create_image(
                     &vk::ImageCreateInfo::default()
                         .image_type(vk::ImageType::TYPE_2D)
-                        .format(IMAGE_FORMAT)
+                        .format(format)
                         .extent(vk::Extent3D {
                             width,
                             height,
@@ -654,7 +684,7 @@ impl Image {
                     &vk::ImageViewCreateInfo::default()
                         .image(image.raw)
                         .view_type(vk::ImageViewType::TYPE_2D)
-                        .format(IMAGE_FORMAT)
+                        .format(format)
                         .subresource_range(color_range()),
                     None,
                 )

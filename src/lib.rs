@@ -1,4 +1,9 @@
+pub mod assets;
 pub mod audio;
+#[allow(dead_code, unused_imports, clippy::all)]
+#[path = "../vendor/avif/mod.rs"]
+mod avif;
+pub use assets::{Asset, Assets, TextureCompression, TextureLoadOptions, get_assets};
 mod renderer;
 pub use audio::{AudioBackend, AudioEngine, AudioLoadMode, AudioPlayer, AudioSource, play_audio};
 mod vulkan;
@@ -53,6 +58,16 @@ pub struct Texture {
     width: u16,
     height: u16,
     pixels: Box<[u8]>,
+    pub(crate) gpu: Option<assets::GpuHandle>,
+}
+impl Drop for Texture {
+    fn drop(&mut self) {
+        if let Some(gpu) = &self.gpu
+            && let Some(retired) = gpu.retired.upgrade()
+        {
+            retired.lock().unwrap().push(gpu.key);
+        }
+    }
 }
 impl Texture {
     pub fn from_rgba(width: u16, height: u16, pixels: Vec<u8>) -> Result<Self, String> {
@@ -64,13 +79,22 @@ impl Texture {
             width,
             height,
             pixels: pixels.into_boxed_slice(),
+            gpu: None,
         })
     }
     pub fn from_file_bytes(bytes: &[u8]) -> Result<Self, String> {
-        let img = image::load_from_memory(bytes).unwrap();
+        let img = assets::decode(bytes)?;
         let (width, height) = img.dimensions();
         let rgba = img.into_rgba8().into_vec();
-        Self::from_rgba(width as u16, height as u16, rgba)
+        Self::from_rgba(
+            width
+                .try_into()
+                .map_err(|_| "texture width exceeds 65535")?,
+            height
+                .try_into()
+                .map_err(|_| "texture height exceeds 65535")?,
+            rgba,
+        )
     }
     pub fn width(&self) -> u16 {
         self.width
@@ -87,6 +111,10 @@ pub struct Surface {
     pub(crate) renderer: u64,
     pub(crate) index: usize,
 }
+// TODO: animations
+pub struct Frame {}
+pub struct SpriteFrames {}
+pub struct AnimatedSprite {}
 pub struct Sprite {
     pub texture: Arc<Texture>,
     pub position: Vec2,
@@ -113,8 +141,9 @@ impl Sprite {
         self.position = position;
     }
     pub(crate) fn signed_size(&self) -> Vec2 {
-        self.size
-            .unwrap_or(vec2(self.texture.width as f32, self.texture.height as f32) * self.scale)
+        self.size.unwrap_or_else(|| {
+            vec2(self.texture.width as f32, self.texture.height as f32) * self.scale
+        })
     }
 }
 pub(crate) fn intersects(position: Vec2, size: Vec2, bounds: Vec2) -> bool {
@@ -128,6 +157,11 @@ pub(crate) fn intersects(position: Vec2, size: Vec2, bounds: Vec2) -> bool {
         && position.y + size.y > 0.
 }
 pub(crate) fn drawable_size(sprite: &Sprite, bounds: Vec2) -> Option<Vec2> {
+    // Positive extents cannot reach back into the viewport from its right/bottom.
+    // Reject before touching the texture, scale, or the remaining color channels.
+    if !sprite.visible || sprite.position.x >= bounds.x || sprite.position.y >= bounds.y {
+        return None;
+    }
     let c = sprite.color;
     if !sprite.visible || c.a <= 0. || ![c.r, c.g, c.b, c.a].iter().all(|v| v.is_finite()) {
         return None;

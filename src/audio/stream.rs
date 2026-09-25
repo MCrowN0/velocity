@@ -24,6 +24,11 @@ pub(super) struct Stream {
     shared: Arc<Shared>,
 }
 impl Stream {
+    #[cfg(test)]
+    pub(super) fn released_probe(&self) -> impl Fn() -> bool + use<> {
+        let weak = Arc::downgrade(&self.shared);
+        move || weak.upgrade().is_none()
+    }
     pub fn new(mut reader: Reader) -> Result<Self, String> {
         let capacity = reader.rate as usize * 3;
         let shared = Arc::new(Shared {

@@ -1,4 +1,27 @@
 use super::*;
+#[test]
+fn texture_handles_do_not_keep_retirement_queue_alive() {
+    let retired = Arc::new(std::sync::Mutex::new(Vec::new()));
+    let mut texture = Texture::from_rgba(1, 1, vec![255; 4]).unwrap();
+    texture.gpu = Some(assets::GpuHandle {
+        owner: 1,
+        key: 42,
+        retired: Arc::downgrade(&retired),
+    });
+    assert_eq!(Arc::strong_count(&retired), 1);
+    drop(texture);
+    assert_eq!(*retired.lock().unwrap(), [42]);
+    let mut texture = Texture::from_rgba(1, 1, vec![255; 4]).unwrap();
+    texture.gpu = Some(assets::GpuHandle {
+        owner: 1,
+        key: 43,
+        retired: Arc::downgrade(&retired),
+    });
+    let weak = Arc::downgrade(&retired);
+    drop(retired);
+    assert!(weak.upgrade().is_none());
+    drop(texture);
+}
 fn sprite() -> Sprite {
     Sprite::new(Arc::new(Texture::from_rgba(2, 2, vec![255; 16]).unwrap()))
 }

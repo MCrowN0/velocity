@@ -236,6 +236,36 @@ impl Voice {
                 return;
             };
             let before = buffer.frames.len();
+            if step == 1. && self.phase == 0. {
+                // Keep the interpolation lookahead while the decoder can produce more.
+                let available = if buffer.eof {
+                    before
+                } else {
+                    before.saturating_sub(1)
+                };
+                let count = output.len().min(available);
+                let (first, second) = buffer.frames.as_slices();
+                let first_count = count.min(first.len());
+                for (out, sample) in output[..first_count].iter_mut().zip(&first[..first_count]) {
+                    out[0] += sample[0] * self.volume;
+                    out[1] += sample[1] * self.volume;
+                }
+                for (out, sample) in output[first_count..count]
+                    .iter_mut()
+                    .zip(&second[..count - first_count])
+                {
+                    out[0] += sample[0] * self.volume;
+                    out[1] += sample[1] * self.volume;
+                }
+                buffer.frames.drain(..count);
+                self.cursor += count as f64;
+                if count < output.len() && buffer.frames.is_empty() && buffer.eof {
+                    self.playing = false;
+                    self.ended = true;
+                }
+                stream.consumed(before, buffer.frames.len());
+                return;
+            }
             for out in output {
                 let advance = (self.phase + step).floor() as usize;
                 if buffer.frames.is_empty() {
@@ -258,6 +288,37 @@ impl Voice {
             }
             stream.consumed(before, buffer.frames.len());
         } else if let Data::Memory(pcm) = &self.source.0.data {
+            if step == 1. && self.cursor.fract() == 0. {
+                let start = (self.cursor as usize).min(pcm.len());
+                let count = output.len().min(pcm.len() - start);
+                match pcm {
+                    Pcm::Mono(samples) => {
+                        for (out, &sample) in output[..count]
+                            .iter_mut()
+                            .zip(&samples[start..start + count])
+                        {
+                            let value = sample * self.volume;
+                            out[0] += value;
+                            out[1] += value;
+                        }
+                    }
+                    Pcm::Stereo(samples) => {
+                        for (out, sample) in output[..count]
+                            .iter_mut()
+                            .zip(&samples[start..start + count])
+                        {
+                            out[0] += sample[0] * self.volume;
+                            out[1] += sample[1] * self.volume;
+                        }
+                    }
+                }
+                self.cursor += count as f64;
+                if count < output.len() {
+                    self.playing = false;
+                    self.ended = true;
+                }
+                return;
+            }
             for out in output {
                 let index = self.cursor as usize;
                 if index >= pcm.len() {

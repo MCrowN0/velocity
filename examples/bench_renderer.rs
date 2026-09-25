@@ -43,13 +43,13 @@ fn main() -> Result<(), String> {
         }
     }
     samples.sort_by(f64::total_cmp);
-    //MESSY AS FUCK
     println!(
-        "{{\"gpu\":\"{}\",\"visible\":{count},\"culled\":{},\"draw_calls\":2,\"median_ms\":{},\"p95_ms\":{},\"instance_bytes\":{}}}",
+        "{{\"gpu\":\"{}\",\"visible\":{count},\"culled\":{},\"draw_calls\":2,\"median_ms\":{},\"p95_ms\":{},\"p99_ms\":{},\"instance_bytes\":{}}}",
         renderer.gpu_name(),
         count * 3,
         samples[300],
         samples[570],
+        samples[594],
         (count + 1) * 48
     );
     Ok(())

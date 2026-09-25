@@ -1,4 +1,18 @@
 fn main() {
+    let target = std::env::var("TARGET").unwrap();
+    assert_eq!(
+        target, "x86_64-pc-windows-msvc",
+        "Velocity's bundled AVIF decoder currently supports Windows x64 MSVC"
+    );
+    let native = std::path::PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap())
+        .join("vendor/avif/native")
+        .join(&target);
+    println!(
+        "cargo:rerun-if-changed={}",
+        native.join("aom.lib").display()
+    );
+    println!("cargo:rustc-link-search=native={}", native.display());
+    println!("cargo:rustc-link-lib=static=aom");
     println!("cargo:rerun-if-changed=src/sprite.wgsl");
     let source = std::fs::read_to_string("src/sprite.wgsl").unwrap();
     let module = naga::front::wgsl::parse_str(&source)
